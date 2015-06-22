@@ -1,5 +1,11 @@
 <resources>
-    <string name="app_name">SpotifyStreamer</string>
-    <string name="hello_world">Hello world!</string>
+
+    <!-- Generic Strings -->
+    <string name="app_name">Spotify Streamer</string>
+
+    <!-- Main activity: list of artists -->
+    <string name="artist_filter_hint">Enter the name of the artist</string>
+
+    <!-- Settings -->
     <string name="action_settings">Settings</string>
 </resources>
