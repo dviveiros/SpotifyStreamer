@@ -13,10 +13,17 @@
         android:id="@+id/artist_filter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/artist_filter_hint" />
+        android:hint="@string/artist_filter_hint"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:imeOptions="actionDone"
+        android:focusableInTouchMode="true"
+        android:inputType="text" />
 
     <ListView android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/listview_artist" />
+        android:id="@+id/listview_artist"
+        android:focusable="true"
+        android:descendantFocusability="beforeDescendants"/>
 
 </LinearLayout>
