@@ -43,7 +43,7 @@ public class ArtistListViewAdapter extends ArrayAdapter<Artist> {
         LayoutInflater mInflater = (LayoutInflater) context
                 .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.artist_listitem, null);
+            convertView = mInflater.inflate(R.layout.artistfilter_listitem, null);
             holder = new ViewHolder();
             holder.artistNameView = (TextView) convertView.findViewById(R.id.artist_name);
             holder.artistIconView = (ImageView) convertView.findViewById(R.id.artist_icon);

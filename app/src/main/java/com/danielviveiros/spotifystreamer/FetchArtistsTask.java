@@ -1,6 +1,5 @@
 package com.danielviveiros.spotifystreamer;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -22,9 +21,9 @@ import kaaes.spotify.webapi.android.models.ArtistsPager;
 public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
 
     /** Log tag */
-    private final String LOG_TAG = FetchArtistsTask.class.getSimpleName();
+    private final String LOG_TAG = FetchArtistsTask.class.getName();
 
-    private Context mContext;
+    private ArtistFilterFragment mArtistFilterFragment;
     private ArrayAdapter mAdapter;
     private String mAccessToken;
 
@@ -33,8 +32,8 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
      * @param adapter Adapter to be populated after fetching the artist list
      *
      */
-    public FetchArtistsTask( Context context, ArrayAdapter adapter, String accessToken ) {
-        mContext = context;
+    public FetchArtistsTask( ArtistFilterFragment artistFilterFragment, ArrayAdapter adapter, String accessToken ) {
+        mArtistFilterFragment = artistFilterFragment;
         mAdapter = adapter;
         mAccessToken = accessToken;
     }
@@ -50,10 +49,13 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
             for (Artist artist : artistList) {
                 mAdapter.add(artist);
             }
+            mArtistFilterFragment.setArtistList(artistList);
         } else {
-            String msgNotFound = mContext.getResources().getString(R.string.artist_filter_not_found);
-            Toast noItensToast = Toast.makeText(mContext, msgNotFound, Toast.LENGTH_LONG);
+            String msgNotFound = mArtistFilterFragment.getResources().getString(R.string.artist_filter_not_found);
+            Toast noItensToast = Toast.makeText(mArtistFilterFragment.getActivity(),
+                    msgNotFound, Toast.LENGTH_LONG);
             noItensToast.show();
+            mArtistFilterFragment.setArtistList(new ArrayList<Artist>());
         }
     }
 
@@ -78,8 +80,7 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
 
         ArtistsPager artistsPager = spotify.searchArtists(artistFilter);
         for (Artist artist: artistsPager.artists.items) {
-            artistsFound.add( artist );
-            Log.v(LOG_TAG, "Artist found: " + artist.name);
+            artistsFound.add(artist);
         }
         Artist[] result = artistsFound.toArray(new Artist[artistsFound.size()]);
 

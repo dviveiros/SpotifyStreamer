@@ -3,21 +3,10 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <!--
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="?android:attr/listPreferredItemHeight"
-        android:gravity="center_vertical"
-        android:id="@+id/artist_textview">
-    </TextView>
-    -->
-
     <ImageView
         android:id="@+id/artist_icon"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:contentDescription="Artist Image"
         android:paddingLeft="10dp"
         android:paddingRight="10dp" />
 
