@@ -9,10 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+
+import kaaes.spotify.webapi.android.models.Artist;
 
 
 /**
@@ -24,7 +27,7 @@ public class MainActivityFragment extends Fragment {
     private static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
     /** Adapter to deal with the list of artists */
-    private ArrayAdapter mArtistListAdapter;
+    private ArtistListViewAdapter mArtistListAdapter;
 
     /** List view */
     private ListView mForecastListView;
@@ -44,16 +47,14 @@ public class MainActivityFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        //set the listener for the edit text
-        EditText artistEditText = (EditText) rootView.findViewById(R.id.artist_filter);
-
         //prepare the list view and adapter
-        mArtistListAdapter = new ArrayAdapter(getActivity(),
-                R.layout.artist_textview,R.id.artist_textview);
+        mArtistListAdapter = new ArtistListViewAdapter(getActivity(),
+                R.layout.artist_listitem, new ArrayList<Artist>());
         mForecastListView = (ListView) rootView.findViewById(R.id.listview_artist);
         mForecastListView.setAdapter(mArtistListAdapter);
 
-        //configure the listener for the artist text field
+        //set the listener for the edit text
+        EditText artistEditText = (EditText) rootView.findViewById(R.id.artist_filter);
         artistEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {

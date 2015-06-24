@@ -17,7 +17,7 @@ import kaaes.spotify.webapi.android.models.ArtistsPager;
  * Async task to fetch Spotify artist data
  * Created by dviveiros on 23/06/15.
  */
-public class FetchArtistsTask extends AsyncTask<String, Void, String[]> {
+public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
 
     /** Log tag */
     private final String LOG_TAG = FetchArtistsTask.class.getSimpleName();
@@ -36,21 +36,21 @@ public class FetchArtistsTask extends AsyncTask<String, Void, String[]> {
     }
 
     @Override
-    protected void onPostExecute(String[] strings) {
-        super.onPostExecute(strings);
+    protected void onPostExecute(Artist[] artists) {
+        super.onPostExecute(artists);
 
-        List<String> artists = new ArrayList<String>(Arrays.asList(strings));
+        List<Artist> artistList = new ArrayList<Artist>(Arrays.asList(artists));
 
         mAdapter.clear();
-        for (String artist: artists) {
+        for (Artist artist: artistList) {
             mAdapter.add(artist);
         }
     }
 
     @Override
-    protected String[] doInBackground(String... params) {
+    protected Artist[] doInBackground(String... params) {
 
-        List<String> artistsFound = new ArrayList<String>();
+        List<Artist> artistsFound = new ArrayList<Artist>();
 
         String artistFilter = null;
         if (params.length == 1) {
@@ -68,10 +68,10 @@ public class FetchArtistsTask extends AsyncTask<String, Void, String[]> {
 
         ArtistsPager artistsPager = spotify.searchArtists(artistFilter);
         for (Artist artist: artistsPager.artists.items) {
-            artistsFound.add( artist.name );
+            artistsFound.add( artist );
             Log.v(LOG_TAG, "Artist found: " + artist.name);
         }
-        String[] result = artistsFound.toArray(new String[artistsFound.size()]);
+        Artist[] result = artistsFound.toArray(new Artist[artistsFound.size()]);
 
         return result;
     }

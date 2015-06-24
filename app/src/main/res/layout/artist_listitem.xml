@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <!--
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?android:attr/listPreferredItemHeight"
+        android:gravity="center_vertical"
+        android:id="@+id/artist_textview">
+    </TextView>
+    -->
+
+    <ImageView
+        android:id="@+id/artist_icon"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:contentDescription="Artist Image"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" />
+
+    <TextView
+        android:id="@+id/artist_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/artist_icon"
+        android:paddingBottom="10dp"
+        android:textSize="16dp">
+    </TextView>
+
+</RelativeLayout>
