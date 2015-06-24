@@ -1,7 +1,8 @@
 package com.danielviveiros.spotifystreamer;
 
-import android.support.v4.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +25,7 @@ public class MainActivityFragment extends Fragment {
     private static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
     /** Adapter to deal with the list of artists */
-    private ArrayAdapter<String> mArtistListAdapter;
+    private ArrayAdapter mArtistListAdapter;
 
     /** List view */
     private ListView mForecastListView;
@@ -45,7 +46,7 @@ public class MainActivityFragment extends Fragment {
         EditText artistEditText = (EditText) rootView.findViewById(R.id.artist_filter);
 
         //prepare the list view and adapter
-        mArtistListAdapter = new ArrayAdapter<String>(getActivity(),
+        mArtistListAdapter = new ArrayAdapter(getActivity(),
                 R.layout.artist_textview,R.id.artist_textview);
         mForecastListView = (ListView) rootView.findViewById(R.id.listview_artist);
         mForecastListView.setAdapter(mArtistListAdapter);
@@ -61,25 +62,8 @@ public class MainActivityFragment extends Fragment {
                     return true;
                 }
                 return false;
-                /*
-                if (actionId == EditorInfo.IME_ACTION_SEARCH ||
-                        actionId == EditorInfo.IME_ACTION_DONE ||
-                        event.getAction() == KeyEvent.ACTION_DOWN &&
-                                event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                    if (!event.isShiftPressed()) {
-                        // the user is done typing.
-                        mArtistFilter = v.getText().toString();
-                        Log.v(LOG_TAG, "Artist filter = " + mArtistFilter);
-                        updateArtistList();
-                        return true; // consume.
-                    }
-                }
-                return false; // pass on to other listeners.
-                */
             }
         });
-
-
 
         return rootView;
     }
@@ -91,8 +75,7 @@ public class MainActivityFragment extends Fragment {
 
         //hides the keyboard
         InputMethodManager imm = (InputMethodManager)
-                this.getActivity().getSystemService(this.getActivity().
-                        getApplicationContext().INPUT_METHOD_SERVICE);
+                this.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         if(imm != null){
             imm.toggleSoftInput(0, InputMethodManager.HIDE_IMPLICIT_ONLY);
         }
