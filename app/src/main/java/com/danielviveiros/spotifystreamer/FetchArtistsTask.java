@@ -21,7 +21,7 @@ import kaaes.spotify.webapi.android.models.ArtistsPager;
 public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
 
     /** Log tag */
-    private final String LOG_TAG = FetchArtistsTask.class.getName();
+    private final String LOG_TAG = FetchArtistsTask.class.getSimpleName();
 
     private ArtistFilterFragment mArtistFilterFragment;
     private ArrayAdapter mAdapter;

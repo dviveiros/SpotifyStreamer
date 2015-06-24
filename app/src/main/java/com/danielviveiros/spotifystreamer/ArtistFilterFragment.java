@@ -27,7 +27,7 @@ import kaaes.spotify.webapi.android.models.Artist;
 public class ArtistFilterFragment extends Fragment {
 
     /** Log tag */
-    private static final String LOG_TAG = ArtistFilterFragment.class.getName();
+    private static final String LOG_TAG = ArtistFilterFragment.class.getSimpleName();
 
     /** Adapter to deal with the list of artists */
     private ArtistListViewAdapter mArtistListAdapter;

@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class TopTracksActivityFragment extends Fragment {
+public class TopTracksFragment extends Fragment {
 
-    private static final String LOG_TAG = TopTracksActivityFragment.class.getName();
+    private static final String LOG_TAG = TopTracksFragment.class.getSimpleName();
 
     /** Access token */
     private String mAccessToken;
@@ -23,7 +23,7 @@ public class TopTracksActivityFragment extends Fragment {
     private String mSelectedArtistId;
     private String mSelectedArtistName;
 
-    public TopTracksActivityFragment() {
+    public TopTracksFragment() {
     }
 
     @Override
