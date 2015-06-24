@@ -7,7 +7,9 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
@@ -78,7 +80,10 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Track[]> {
         api.setAccessToken(mAccessToken);
         SpotifyService spotify = api.getService();
 
-        Tracks tracks = spotify.getArtistTopTrack(artistId);
+        Map<String,Object> mapParams = new HashMap<String,Object>();
+        //TODO: make the country a setting
+        mapParams.put("country", "BR");
+        Tracks tracks = spotify.getArtistTopTrack(artistId, mapParams);
         for (Track track: tracks.tracks) {
             tracksFound.add(track);
         }
