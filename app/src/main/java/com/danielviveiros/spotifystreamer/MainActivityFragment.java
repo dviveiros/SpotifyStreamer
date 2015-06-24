@@ -13,7 +13,6 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 /**
@@ -32,6 +31,9 @@ public class MainActivityFragment extends Fragment {
 
     /** Filter */
     private String mArtistFilter;
+
+    /** Spotify access token */
+    private String mAccessToken;
 
     public MainActivityFragment() {
     }
@@ -65,6 +67,10 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
+        //gets spotify access token
+        MainActivity mainActivity = (MainActivity) this.getActivity();
+        mAccessToken = mainActivity.getSpotifyAccessToken();
+
         return rootView;
     }
 
@@ -80,8 +86,8 @@ public class MainActivityFragment extends Fragment {
             imm.toggleSoftInput(0, InputMethodManager.HIDE_IMPLICIT_ONLY);
         }
 
-        //show the result
-        Toast toast = Toast.makeText(this.getActivity().getBaseContext(), mArtistFilter, Toast.LENGTH_SHORT);
-        toast.show();
+        //trigger the artist fetching
+        FetchArtistsTask artistsTask = new FetchArtistsTask(mArtistListAdapter, mAccessToken);
+        artistsTask.execute(mArtistFilter);
     }
 }

@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements
                 // Response was successful and contains auth token
                 case TOKEN:
                     mAccessToken = response.getAccessToken();
-                    Log.v(LOG_TAG, "Access token is here: " + mAccessToken);
 
                     Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
                     mPlayer = Spotify.getPlayer(playerConfig, this, new Player.InitializationObserver() {
@@ -115,6 +114,19 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * Returns the Spotify access token
+     */
+    public String getSpotifyAccessToken() {
+        return mAccessToken;
+    }
+
+    /**
+     * Returns the Spotify player
+     */
+    public Player getSpotifyPlayer() {
+        return mPlayer;
+    }
 
     @Override
     public void onLoggedIn() {
