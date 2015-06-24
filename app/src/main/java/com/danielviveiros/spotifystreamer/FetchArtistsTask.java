@@ -1,8 +1,10 @@
 package com.danielviveiros.spotifystreamer;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +24,7 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
     /** Log tag */
     private final String LOG_TAG = FetchArtistsTask.class.getSimpleName();
 
+    private Context mContext;
     private ArrayAdapter mAdapter;
     private String mAccessToken;
 
@@ -30,7 +33,8 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
      * @param adapter Adapter to be populated after fetching the artist list
      *
      */
-    public FetchArtistsTask( ArrayAdapter adapter, String accessToken ) {
+    public FetchArtistsTask( Context context, ArrayAdapter adapter, String accessToken ) {
+        mContext = context;
         mAdapter = adapter;
         mAccessToken = accessToken;
     }
@@ -39,11 +43,17 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
     protected void onPostExecute(Artist[] artists) {
         super.onPostExecute(artists);
 
-        List<Artist> artistList = new ArrayList<Artist>(Arrays.asList(artists));
-
         mAdapter.clear();
-        for (Artist artist: artistList) {
-            mAdapter.add(artist);
+
+        if (artists.length > 0) {
+            List<Artist> artistList = new ArrayList<Artist>(Arrays.asList(artists));
+            for (Artist artist : artistList) {
+                mAdapter.add(artist);
+            }
+        } else {
+            String msgNotFound = mContext.getResources().getString(R.string.artist_filter_not_found);
+            Toast noItensToast = Toast.makeText(mContext, msgNotFound, Toast.LENGTH_LONG);
+            noItensToast.show();
         }
     }
 

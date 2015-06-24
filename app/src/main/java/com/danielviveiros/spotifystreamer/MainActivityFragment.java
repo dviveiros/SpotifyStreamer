@@ -60,8 +60,15 @@ public class MainActivityFragment extends Fragment {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    getActivity().getCurrentFocus();
                     mArtistFilter = v.getText().toString();
                     updateArtistList();
+
+                    //hide the keyboard
+                    InputMethodManager imm =  (InputMethodManager) getActivity().
+                            getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+
                     return true;
                 }
                 return false;
@@ -80,15 +87,10 @@ public class MainActivityFragment extends Fragment {
      */
     private void updateArtistList() {
 
-        //hides the keyboard
-        InputMethodManager imm = (InputMethodManager)
-                this.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if(imm != null){
-            imm.toggleSoftInput(0, InputMethodManager.HIDE_IMPLICIT_ONLY);
-        }
-
         //trigger the artist fetching
-        FetchArtistsTask artistsTask = new FetchArtistsTask(mArtistListAdapter, mAccessToken);
+        FetchArtistsTask artistsTask = new FetchArtistsTask(getActivity().getBaseContext(),
+                mArtistListAdapter, mAccessToken);
         artistsTask.execute(mArtistFilter);
+
     }
 }
