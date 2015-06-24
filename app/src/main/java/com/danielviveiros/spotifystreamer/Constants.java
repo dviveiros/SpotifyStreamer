@@ -9,4 +9,8 @@ public interface Constants {
 
     /** Access token */
     public static final String ACCESS_TOKEN_KEY = "ACCESS_TOKEN_KEY";
+
+    /** Intent parameter keys */
+    public static final String ARTIST_ID_KEY = "artistId";
+    public static final String ARTIST_NAME_KEY = "artistName";
 }

@@ -36,7 +36,7 @@ public class ArtistFilterFragment extends Fragment {
     private MainActivity mMainActivity;
 
     /** List view */
-    private ListView mForecastListView;
+    private ListView mArtistsListView;
 
     /** Filter */
     private String mArtistFilter;
@@ -54,26 +54,26 @@ public class ArtistFilterFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.artistfilter_fragment, container, false);
 
-        //gets spotify access token
+        //gets a reference to the main activity
         mMainActivity = (MainActivity) this.getActivity();
 
         //prepare the list view and adapter
         mArtistListAdapter = new ArtistListViewAdapter(getActivity(),
                 R.layout.artistfilter_listitem, new ArrayList<Artist>());
-        mForecastListView = (ListView) rootView.findViewById(R.id.listview_artist);
-        mForecastListView.setAdapter(mArtistListAdapter);
+        mArtistsListView = (ListView) rootView.findViewById(R.id.listview_artist);
+        mArtistsListView.setAdapter(mArtistListAdapter);
 
         //set the click listener to the list view
-        mForecastListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mArtistsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 if (mArtistList != null) {
                     Artist artist = mArtistList.get(i);
                     Intent detailIntent = new Intent(getActivity(), TopTracksActivity.class)
-                            .putExtra("selectedArtistId", artist.id)
-                            .putExtra("selectedArtistName", artist.name)
-                            .putExtra("accessToken", mMainActivity.getSpotifyAccessToken());
+                            .putExtra(Constants.ARTIST_ID_KEY, artist.id)
+                            .putExtra(Constants.ARTIST_NAME_KEY, artist.name)
+                            .putExtra(Constants.ACCESS_TOKEN_KEY, mMainActivity.getSpotifyAccessToken());
                     startActivity(detailIntent);
                 }
             }

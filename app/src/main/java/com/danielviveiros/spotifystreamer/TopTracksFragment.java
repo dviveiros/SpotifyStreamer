@@ -7,6 +7,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import kaaes.spotify.webapi.android.models.Track;
 
 
 /**
@@ -23,7 +29,15 @@ public class TopTracksFragment extends Fragment {
     private String mSelectedArtistId;
     private String mSelectedArtistName;
 
+    /** Top tracks list */
+    private List<Track> mTrackList;
+
+    /** Adapter and ListView*/
+    private TopTracksViewAdapter mTopTracksViewAdapter;
+    private ListView mTopTracksListView;
+
     public TopTracksFragment() {
+        mTrackList = new ArrayList<Track>();
     }
 
     @Override
@@ -33,13 +47,38 @@ public class TopTracksFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.toptracks_fragment, container, false);
 
         Intent intent = getActivity().getIntent();
-        mSelectedArtistId = intent.getStringExtra("selectedArtistId");
-        mSelectedArtistName = intent.getStringExtra("selectedArtistName");
-        mAccessToken = intent.getStringExtra("accessToken");
+        mSelectedArtistId = intent.getStringExtra(Constants.ARTIST_ID_KEY);
+        mSelectedArtistName = intent.getStringExtra(Constants.ARTIST_NAME_KEY);
+        mAccessToken = intent.getStringExtra(Constants.ACCESS_TOKEN_KEY);
         Log.v(LOG_TAG, "Artist id = " + mSelectedArtistId + ", artist name = " + mSelectedArtistName
                 + ", access token = " + mAccessToken);
 
+        //prepare the list view and adapter
+        mTopTracksViewAdapter = new TopTracksViewAdapter(getActivity(),
+                R.layout.toptracks_listitem, new ArrayList<Track>());
+        mTopTracksListView = (ListView) rootView.findViewById(R.id.listview_toptracks);
+        mTopTracksListView.setAdapter(mTopTracksViewAdapter);
+
+        this.updateTopTracks();
 
         return rootView;
+    }
+
+    /**
+     * Defines the track list
+     */
+    public void setTrackList( List<Track> trackList ) {
+        mTrackList = trackList;
+    }
+
+    /**
+     * Updates the list of top tracks
+     */
+    private void updateTopTracks() {
+
+        //trigger the artist fetching
+        FetchTracksTask tracksTask = new FetchTracksTask(this, mTopTracksViewAdapter,
+                mAccessToken);
+        tracksTask.execute(mSelectedArtistId);
     }
 }

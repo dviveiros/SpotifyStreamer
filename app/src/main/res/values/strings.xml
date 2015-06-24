@@ -9,6 +9,7 @@
 
     <!-- Main activity: Top 10 Tracks -->
     <string name="title_activity_top_tracks">Top 10 Tracks</string>
+    <string name="top_tracks_not_found">No tracks found for this artist</string>
 
     <!-- Settings -->
     <string name="action_settings">Settings</string>
