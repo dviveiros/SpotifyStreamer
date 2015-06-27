@@ -13,5 +13,8 @@
 
     <!-- Settings -->
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="pref_country_key">pref_country</string>
+    <string name="pref_country_title">Your Country</string>
+    <string name="pref_country_default">BR</string>
+
 </resources>
