@@ -64,6 +64,12 @@ public class TopTracksFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateTopTracks();
+    }
+
     /**
      * Defines the track list
      */

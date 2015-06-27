@@ -2,19 +2,20 @@ package com.danielviveiros.spotifystreamer;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.spotify.sdk.android.authentication.AuthenticationClient;
 
-public class TopTracksActivity extends ActionBarActivity {
+
+public class TopTracksActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_top_tracks);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -35,6 +36,8 @@ public class TopTracksActivity extends ActionBarActivity {
             Intent intent = new Intent( this, SettingsActivity.class );
             startActivity( intent );
             return true;
+        } else if (id == R.id.action_logout) {
+            AuthenticationClient.logout(getBaseContext());
         }
 
         return super.onOptionsItemSelected(item);

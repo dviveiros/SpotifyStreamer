@@ -73,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements
             Intent intent = new Intent( this, SettingsActivity.class );
             startActivity( intent );
             return true;
+        } else if (id == R.id.action_logout) {
+            AuthenticationClient.logout(getBaseContext());
         }
 
         return super.onOptionsItemSelected(item);
