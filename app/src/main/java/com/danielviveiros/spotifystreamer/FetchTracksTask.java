@@ -1,6 +1,8 @@
 package com.danielviveiros.spotifystreamer;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -80,9 +82,15 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Track[]> {
         api.setAccessToken(mAccessToken);
         SpotifyService spotify = api.getService();
 
+        //gets the country
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
+                mTopTracksFragment.getActivity().getBaseContext());
+        String country = prefs.getString(
+                mTopTracksFragment.getResources().getString(R.string.pref_country_key),
+                mTopTracksFragment.getResources().getString(R.string.pref_country_default));
         Map<String,Object> mapParams = new HashMap<String,Object>();
-        //TODO: make the country a setting
-        mapParams.put("country", "BR");
+        mapParams.put("country", country.toUpperCase());
+
         Tracks tracks = spotify.getArtistTopTrack(artistId, mapParams);
         for (Track track: tracks.tracks) {
             tracksFound.add(track);
