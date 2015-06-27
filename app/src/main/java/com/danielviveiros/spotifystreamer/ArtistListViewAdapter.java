@@ -37,7 +37,7 @@ public class ArtistListViewAdapter extends ArrayAdapter<Artist> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder = null;
+        ViewHolder holder;
         Artist artist = getItem(position);
 
         LayoutInflater mInflater = (LayoutInflater) context

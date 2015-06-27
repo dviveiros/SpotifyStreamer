@@ -68,7 +68,7 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Track[]> {
 
         List<Track> tracksFound = new ArrayList<Track>();
 
-        String artistId = null;
+        String artistId;
         if (params.length == 1) {
             artistId = params[0];
         } else {
@@ -89,7 +89,9 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Track[]> {
                 mTopTracksFragment.getResources().getString(R.string.pref_country_key),
                 mTopTracksFragment.getResources().getString(R.string.pref_country_default));
         Map<String,Object> mapParams = new HashMap<String,Object>();
-        mapParams.put("country", country.toUpperCase());
+        if (country != null) {
+            mapParams.put("country", country.toUpperCase());
+        }
 
         Tracks tracks = spotify.getArtistTopTrack(artistId, mapParams);
         for (Track track: tracks.tracks) {

@@ -6,8 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.spotify.sdk.android.authentication.AuthenticationClient;
-
 
 public class TopTracksActivity extends AppCompatActivity {
 
@@ -36,9 +34,12 @@ public class TopTracksActivity extends AppCompatActivity {
             Intent intent = new Intent( this, SettingsActivity.class );
             startActivity( intent );
             return true;
-        } else if (id == R.id.action_logout) {
+        }
+        /*
+        else if (id == R.id.action_logout) {
             AuthenticationClient.logout(getBaseContext());
         }
+        */
 
         return super.onOptionsItemSelected(item);
     }

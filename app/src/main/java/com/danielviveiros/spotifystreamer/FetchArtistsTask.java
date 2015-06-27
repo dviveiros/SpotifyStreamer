@@ -64,7 +64,7 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
 
         List<Artist> artistsFound = new ArrayList<Artist>();
 
-        String artistFilter = null;
+        String artistFilter;
         if (params.length == 1) {
             artistFilter = params[0];
         } else {

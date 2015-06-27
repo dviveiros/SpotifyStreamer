@@ -1,24 +1,14 @@
 package com.danielviveiros.spotifystreamer;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.spotify.sdk.android.authentication.AuthenticationClient;
-import com.spotify.sdk.android.authentication.AuthenticationRequest;
-import com.spotify.sdk.android.authentication.AuthenticationResponse;
-import com.spotify.sdk.android.player.ConnectionStateCallback;
-import com.spotify.sdk.android.player.PlayerNotificationCallback;
-import com.spotify.sdk.android.player.PlayerState;
 
-
-public class MainActivity extends AppCompatActivity implements
-        PlayerNotificationCallback, ConnectionStateCallback {
+public class MainActivity extends AppCompatActivity {
+        //implements PlayerNotificationCallback, ConnectionStateCallback {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -26,23 +16,28 @@ public class MainActivity extends AppCompatActivity implements
     private static final int REQUEST_CODE = 1337;
     private static final String REDIRECT_URI = "spotify-streamer-login://callback";
     private static final String CLIENT_ID = "e8adcbe86eb7453994fdd474bf780712";
-    private String mAccessToken;
+    //This version will not authenticate on Spotify, so the access token will be null
+    //Later, I will add Spotify Login to enhance the experience
+    private String mAccessToken = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /*
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mAccessToken = prefs.getString(Constants.ACCESS_TOKEN_KEY, null);
         if ( mAccessToken == null ) {
             loginSpotify();
         }
+        */
     }
 
     /**
      * Login to Spotify
      */
+    /*
     public void loginSpotify() {
         //Spotify login
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
@@ -52,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements
         AuthenticationRequest request = builder.build();
         AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
     }
+    */
 
 
     @Override
@@ -73,16 +69,27 @@ public class MainActivity extends AppCompatActivity implements
             Intent intent = new Intent( this, SettingsActivity.class );
             startActivity( intent );
             return true;
-        } else if (id == R.id.action_logout) {
+        }
+        /*
+        else if (id == R.id.action_logout) {
             AuthenticationClient.logout(getBaseContext());
         }
+        */
 
         return super.onOptionsItemSelected(item);
     }
 
     /**
+     * Returns the Spotify access token
+     */
+    public String getSpotifyAccessToken() {
+        return mAccessToken;
+    }
+
+    /**
      * Callback with the token provided by spotify
      */
+    /*
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
@@ -110,13 +117,6 @@ public class MainActivity extends AppCompatActivity implements
                             response.getCode() + ", " + response.getState() );
             }
         }
-    }
-
-    /**
-     * Returns the Spotify access token
-     */
-    public String getSpotifyAccessToken() {
-        return mAccessToken;
     }
 
     @Override
@@ -158,4 +158,5 @@ public class MainActivity extends AppCompatActivity implements
     protected void onDestroy() {
         super.onDestroy();
     }
+        */
 }

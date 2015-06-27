@@ -38,7 +38,7 @@ public class TopTracksViewAdapter extends ArrayAdapter<Track> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder = null;
+        ViewHolder holder;
         Track track = getItem(position);
 
         LayoutInflater mInflater = (LayoutInflater) context
