@@ -30,6 +30,7 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Track[]> {
     private TopTracksFragment mTopTracksFragment;
     private ArrayAdapter mAdapter;
     private String mAccessToken;
+    private boolean mErrorState;
 
     /**
      * Constructor
@@ -40,26 +41,33 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Track[]> {
         mTopTracksFragment = topTracksFragment;
         mAdapter = adapter;
         mAccessToken = accessToken;
+        mErrorState = false;
     }
 
     @Override
     protected void onPostExecute(Track[] tracks) {
         super.onPostExecute(tracks);
 
-        mAdapter.clear();
-
-        if (tracks.length > 0) {
-            List<Track> trackList = new ArrayList<Track>(Arrays.asList(tracks));
-            for (Track track: trackList) {
-                mAdapter.add(track);
+        if (!mErrorState) {
+            mAdapter.clear();
+            if (tracks.length > 0) {
+                List<Track> trackList = new ArrayList<Track>(Arrays.asList(tracks));
+                for (Track track : trackList) {
+                    mAdapter.add(track);
+                }
+                mTopTracksFragment.setTrackList(trackList);
+            } else {
+                String msgNotFound = mTopTracksFragment.getResources().getString(R.string.top_tracks_not_found);
+                Toast noItensToast = Toast.makeText(mTopTracksFragment.getActivity(),
+                        msgNotFound, Toast.LENGTH_LONG);
+                noItensToast.show();
+                mTopTracksFragment.setTrackList(new ArrayList<Track>());
             }
-            mTopTracksFragment.setTrackList(trackList);
         } else {
-            String msgNotFound = mTopTracksFragment.getResources().getString(R.string.top_tracks_not_found);
-            Toast noItensToast = Toast.makeText(mTopTracksFragment.getActivity(),
-                    msgNotFound, Toast.LENGTH_LONG);
-            noItensToast.show();
-            mTopTracksFragment.setTrackList(new ArrayList<Track>());
+            Toast toast = Toast.makeText(mTopTracksFragment.getActivity().getBaseContext(),
+                    mTopTracksFragment.getResources().getText(R.string.top_tracks_filter_error),
+                    Toast.LENGTH_LONG);
+            toast.show();
         }
     }
 
@@ -77,11 +85,6 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Track[]> {
             throw new RuntimeException( message );
         }
 
-        //instantiates the spotify API
-        SpotifyApi api = new SpotifyApi();
-        api.setAccessToken(mAccessToken);
-        SpotifyService spotify = api.getService();
-
         //gets the country
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
                 mTopTracksFragment.getActivity().getBaseContext());
@@ -93,10 +96,20 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Track[]> {
             mapParams.put("country", country.toUpperCase());
         }
 
-        Tracks tracks = spotify.getArtistTopTrack(artistId, mapParams);
-        for (Track track: tracks.tracks) {
-            tracksFound.add(track);
+        try {
+            //instantiates the spotify API
+            SpotifyApi api = new SpotifyApi();
+            api.setAccessToken(mAccessToken);
+            SpotifyService spotify = api.getService();
+            Tracks tracks = spotify.getArtistTopTrack(artistId, mapParams);
+            for (Track track : tracks.tracks) {
+                tracksFound.add(track);
+            }
+        } catch ( Exception exc ) {
+            Log.e(LOG_TAG, exc.getMessage(), exc);
+            mErrorState = true;
         }
+
         Track[] result = tracksFound.toArray(new Track[tracksFound.size()]);
 
         return result;

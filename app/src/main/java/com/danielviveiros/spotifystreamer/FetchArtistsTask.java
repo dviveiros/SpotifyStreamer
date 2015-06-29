@@ -26,6 +26,7 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
     private ArtistFilterFragment mArtistFilterFragment;
     private ArrayAdapter mAdapter;
     private String mAccessToken;
+    private boolean mErrorState;
 
     /**
      * Constructor
@@ -36,26 +37,33 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
         mArtistFilterFragment = artistFilterFragment;
         mAdapter = adapter;
         mAccessToken = accessToken;
+        mErrorState = false;
     }
 
     @Override
     protected void onPostExecute(Artist[] artists) {
         super.onPostExecute(artists);
 
-        mAdapter.clear();
-
-        if (artists.length > 0) {
-            List<Artist> artistList = new ArrayList<Artist>(Arrays.asList(artists));
-            for (Artist artist : artistList) {
-                mAdapter.add(artist);
+        if (!mErrorState) {
+            mAdapter.clear();
+            if (artists.length > 0) {
+                List<Artist> artistList = new ArrayList<Artist>(Arrays.asList(artists));
+                for (Artist artist : artistList) {
+                    mAdapter.add(artist);
+                }
+                mArtistFilterFragment.setArtistList(artistList);
+            } else {
+                String msgNotFound = mArtistFilterFragment.getResources().getString(R.string.artist_filter_not_found);
+                Toast noItensToast = Toast.makeText(mArtistFilterFragment.getActivity(),
+                        msgNotFound, Toast.LENGTH_LONG);
+                noItensToast.show();
+                mArtistFilterFragment.setArtistList(new ArrayList<Artist>());
             }
-            mArtistFilterFragment.setArtistList(artistList);
         } else {
-            String msgNotFound = mArtistFilterFragment.getResources().getString(R.string.artist_filter_not_found);
-            Toast noItensToast = Toast.makeText(mArtistFilterFragment.getActivity(),
-                    msgNotFound, Toast.LENGTH_LONG);
-            noItensToast.show();
-            mArtistFilterFragment.setArtistList(new ArrayList<Artist>());
+            Toast toast = Toast.makeText(mArtistFilterFragment.getActivity().getBaseContext(),
+                    mArtistFilterFragment.getResources().getText(R.string.artist_filter_error),
+                    Toast.LENGTH_LONG);
+            toast.show();
         }
     }
 
@@ -73,14 +81,21 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
             throw new RuntimeException( message );
         }
 
-        //instantiates the spotify API
-        SpotifyApi api = new SpotifyApi();
-        api.setAccessToken(mAccessToken);
-        SpotifyService spotify = api.getService();
+        try {
+            //instantiates the spotify API
+            SpotifyApi api = new SpotifyApi();
+            api.setAccessToken(mAccessToken);
+            SpotifyService spotify = api.getService();
 
-        ArtistsPager artistsPager = spotify.searchArtists(artistFilter);
-        for (Artist artist: artistsPager.artists.items) {
-            artistsFound.add(artist);
+            ArtistsPager artistsPager = spotify.searchArtists(artistFilter);
+            for (Artist artist : artistsPager.artists.items) {
+                artistsFound.add(artist);
+            }
+        } catch ( Exception exc ) {
+            //handles exception connecting to spotify
+            Log.e(LOG_TAG, exc.getMessage(), exc);
+            mErrorState = true;
+
         }
         Artist[] result = artistsFound.toArray(new Artist[artistsFound.size()]);
 

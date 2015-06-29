@@ -6,10 +6,12 @@
     <!-- Main activity: list of artists -->
     <string name="artist_filter_hint">Enter the name of the artist</string>
     <string name="artist_filter_not_found">No artists found</string>
+    <string name="artist_filter_error">Error fetching artists. Internet OK?</string>
 
     <!-- Main activity: Top 10 Tracks -->
     <string name="title_activity_top_tracks">Top 10 Tracks</string>
     <string name="top_tracks_not_found">No tracks found for this artist</string>
+    <string name="top_tracks_filter_error">Error fetching tracks. Internet OK?</string>
 
     <!-- Settings -->
     <string name="action_settings">Settings</string>
