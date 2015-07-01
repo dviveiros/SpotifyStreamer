@@ -96,9 +96,10 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Track[]> {
             mapParams.put("country", country.toUpperCase());
         }
 
+        //instantiates the spotify API
+        SpotifyApi api = new SpotifyApi();
+
         try {
-            //instantiates the spotify API
-            SpotifyApi api = new SpotifyApi();
             api.setAccessToken(mAccessToken);
             SpotifyService spotify = api.getService();
             Tracks tracks = spotify.getArtistTopTrack(artistId, mapParams);

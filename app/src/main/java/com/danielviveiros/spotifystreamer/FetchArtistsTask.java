@@ -81,9 +81,10 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
             throw new RuntimeException( message );
         }
 
+        //instantiates the spotify API
+        SpotifyApi api = new SpotifyApi();
+
         try {
-            //instantiates the spotify API
-            SpotifyApi api = new SpotifyApi();
             api.setAccessToken(mAccessToken);
             SpotifyService spotify = api.getService();
 

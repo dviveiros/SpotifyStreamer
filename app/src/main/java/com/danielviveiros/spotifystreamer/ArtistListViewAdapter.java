@@ -55,7 +55,8 @@ public class ArtistListViewAdapter extends ArrayAdapter<Artist> {
         holder.artistNameView.setText(artist.name);
         List<Image> images = artist.images;
         if ((images != null) && (images.size() > 0)) {
-            Image artistImage = images.get(0);
+            //get the last image, the smaller one
+            Image artistImage = images.get( images.size() - 1 );
             Picasso.with(context).load(artistImage.url).into(holder.artistIconView);
         }
 
