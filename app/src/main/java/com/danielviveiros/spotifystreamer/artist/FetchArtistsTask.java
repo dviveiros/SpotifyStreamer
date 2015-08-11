@@ -1,12 +1,16 @@
-package com.danielviveiros.spotifystreamer;
+package com.danielviveiros.spotifystreamer.artist;
 
+import android.content.ContentValues;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.Toast;
+
+import com.danielviveiros.spotifystreamer.data.SpotifyStreamerContract;
+import com.danielviveiros.spotifystreamer.data.SpotifyStreamerDBHelper;
+import com.danielviveiros.spotifystreamer.util.Utilities;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
@@ -18,7 +22,7 @@ import kaaes.spotify.webapi.android.models.ArtistsPager;
  * Async task to fetch Spotify artist data
  * Created by dviveiros on 23/06/15.
  */
-public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
+public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
 
     /** Log tag */
     private final String LOG_TAG = FetchArtistsTask.class.getSimpleName();
@@ -27,21 +31,23 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
     private ArrayAdapter mAdapter;
     private String mAccessToken;
     private boolean mErrorState;
+    private Context mContext;
 
     /**
      * Constructor
-     * @param adapter Adapter to be populated after fetching the artist list
-     *
      */
-    public FetchArtistsTask( ArtistFilterFragment artistFilterFragment, ArrayAdapter adapter, String accessToken ) {
-        mArtistFilterFragment = artistFilterFragment;
-        mAdapter = adapter;
+    public FetchArtistsTask( Context context, String accessToken ) {
+        //mArtistFilterFragment = artistFilterFragment;
+        //mAdapter = adapter;
         mAccessToken = accessToken;
         mErrorState = false;
+        mContext = context;
     }
 
+
+    /*
     @Override
-    protected void onPostExecute(Artist[] artists) {
+    protected void onPostExecute() {
         super.onPostExecute(artists);
 
         if (!mErrorState) {
@@ -66,17 +72,18 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
             toast.show();
         }
     }
+    */
 
     @Override
-    protected Artist[] doInBackground(String... params) {
+    protected Void doInBackground(String... params) {
 
-        List<Artist> artistsFound = new ArrayList<Artist>();
+        List<ContentValues> artistsFound = new ArrayList<ContentValues>();
 
         String artistFilter;
         if (params.length == 1) {
             artistFilter = params[0];
         } else {
-            String message = "Artist filter expected. Found length = " + params.length;
+            String message = "StreamerArtist filter expected. Found length = " + params.length;
             Log.e(LOG_TAG, message);
             throw new RuntimeException( message );
         }
@@ -90,16 +97,49 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
 
             ArtistsPager artistsPager = spotify.searchArtists(artistFilter);
             for (Artist artist : artistsPager.artists.items) {
-                artistsFound.add(artist);
+                ContentValues artistValues = new ContentValues();
+                artistValues.put(SpotifyStreamerContract.ArtistEntry.COLUMN_NAME, artist.name);
+                artistValues.put(SpotifyStreamerContract.ArtistEntry.COLUMN_IMAGE_URL,
+                        Utilities.getSmallerImage(artist.images));
+                artistsFound.add(artistValues);
             }
+
+            // add to database
+            int inserted = 0;
+            if ( artistsFound.size() > 0 ) {
+                deleteAllRecords();
+                ContentValues[] cvArray = artistsFound.toArray(
+                        new ContentValues[ artistsFound.size()]);
+                inserted = mContext.getContentResolver().bulkInsert(
+                        SpotifyStreamerContract.ArtistEntry.CONTENT_URI, cvArray);
+            }
+
+            Log.d(LOG_TAG, "FetchArtists Complete. " + inserted + " Inserted");
+
         } catch ( Exception exc ) {
             //handles exception connecting to spotify
             Log.e(LOG_TAG, exc.getMessage(), exc);
             mErrorState = true;
 
         }
-        Artist[] result = artistsFound.toArray(new Artist[artistsFound.size()]);
 
+
+        /*
+        Artist[] result = artistsFound.toArray(new Artist[artistsFound.size()]);
         return result;
+        */
+        return null;
+    }
+
+    /**
+     * Delete all artists from the database
+     */
+    private void deleteAllRecords() {
+        /*
+        mContext.getContentResolver().delete(SpotifyStreamerContract.ArtistEntry.CONTENT_URI,
+                null, null);
+                */
+        SpotifyStreamerDBHelper helper = new SpotifyStreamerDBHelper(mContext);
+        helper.getWritableDatabase().delete(SpotifyStreamerContract.ArtistEntry.TABLE_NAME, null, null);
     }
 }

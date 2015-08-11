@@ -1,4 +1,4 @@
-package com.danielviveiros.spotifystreamer;
+package com.danielviveiros.spotifystreamer.track;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+
+import com.danielviveiros.spotifystreamer.R;
+import com.danielviveiros.spotifystreamer.util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +53,7 @@ public class TopTracksFragment extends Fragment {
         mSelectedArtistId = intent.getStringExtra(Constants.ARTIST_ID_KEY);
         mSelectedArtistName = intent.getStringExtra(Constants.ARTIST_NAME_KEY);
         mAccessToken = intent.getStringExtra(Constants.ACCESS_TOKEN_KEY);
-        Log.v(LOG_TAG, "Artist id = " + mSelectedArtistId + ", artist name = " + mSelectedArtistName
+        Log.v(LOG_TAG, "StreamerArtist id = " + mSelectedArtistId + ", artist name = " + mSelectedArtistName
                 + ", access token = " + mAccessToken);
 
         //prepare the list view and adapter

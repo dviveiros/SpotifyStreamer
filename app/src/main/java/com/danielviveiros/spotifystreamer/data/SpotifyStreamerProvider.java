@@ -27,7 +27,7 @@ public class SpotifyStreamerProvider extends ContentProvider {
     // Db Helper
     private SpotifyStreamerDBHelper mDBHelper;
 
-    //Artist basic entry
+    //StreamerArtist basic entry
     static final int ARTIST = 100;
     //Track basic entry
     static final int TRACK = 101;
@@ -216,7 +216,7 @@ public class SpotifyStreamerProvider extends ContentProvider {
 
     private Cursor getArtistByName( Uri uri, String[] projection, String sortOrder) {
         String artistName = ArtistEntry.getArtistNameFromUri(uri);
-        Log.v(LOG_TAG, "Artist name to be used in the filter = " + artistName);
+        Log.v(LOG_TAG, "StreamerArtist name to be used in the filter = " + artistName);
 
         return mDBHelper.getReadableDatabase().query(
                 ArtistEntry.TABLE_NAME,
@@ -230,7 +230,7 @@ public class SpotifyStreamerProvider extends ContentProvider {
 
     private Cursor getTrackByArtist( Uri uri, String[] projection, String sortOrder) {
         String artistId = TrackEntry.getArtistIdFromUri(uri);
-        Log.v( LOG_TAG, "Artist ID to be used in the filter = " + artistId );
+        Log.v( LOG_TAG, "StreamerArtist ID to be used in the filter = " + artistId );
 
         return mDBHelper.getReadableDatabase().query(
                 TrackEntry.TABLE_NAME,

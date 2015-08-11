@@ -1,4 +1,4 @@
-package com.danielviveiros.spotifystreamer;
+package com.danielviveiros.spotifystreamer.track;
 
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -6,6 +6,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
+
+import com.danielviveiros.spotifystreamer.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,7 +82,7 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Track[]> {
         if (params.length == 1) {
             artistId = params[0];
         } else {
-            String message = "Artist ID expected. Found length = " + params.length;
+            String message = "StreamerArtist ID expected. Found length = " + params.length;
             Log.e(LOG_TAG, message);
             throw new RuntimeException( message );
         }

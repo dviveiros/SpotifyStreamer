@@ -34,11 +34,11 @@ public class SpotifyStreamerContract {
 
         public static final String TABLE_NAME = "artist";
 
-        //Artist ID
+        //StreamerArtist ID
         public static final String COLUMN_ID = "id";
-        //Artist name
+        //StreamerArtist name
         public static final String COLUMN_NAME = "name";
-        //Artist image URL
+        //StreamerArtist image URL
         public static final String COLUMN_IMAGE_URL = "image_url";
 
         public static final Uri CONTENT_URI =
@@ -50,6 +50,10 @@ public class SpotifyStreamerContract {
 
         public static Uri buildArtistUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildArtistByName(String artistName) {
+            return CONTENT_URI.buildUpon().appendPath(artistName).build();
         }
 
         public static String getArtistNameFromUri(Uri uri) {
@@ -67,7 +71,7 @@ public class SpotifyStreamerContract {
 
         //Track ID
         public static final String COLUMN_ID = "id";
-        //Artist FK
+        //StreamerArtist FK
         public static final String COLUMN_ARTIST_KEY = "artist_id";
         //Track name
         public static final String COLUMN_NAME = "name";

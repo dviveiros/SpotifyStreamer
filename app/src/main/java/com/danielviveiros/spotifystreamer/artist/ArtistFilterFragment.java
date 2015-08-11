@@ -1,9 +1,15 @@
-package com.danielviveiros.spotifystreamer;
+package com.danielviveiros.spotifystreamer.artist;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +21,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.danielviveiros.spotifystreamer.R;
+import com.danielviveiros.spotifystreamer.data.SpotifyStreamerContract;
+import com.danielviveiros.spotifystreamer.main.MainActivity;
+import com.danielviveiros.spotifystreamer.track.TopTracksActivity;
+import com.danielviveiros.spotifystreamer.util.Constants;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,13 +36,17 @@ import kaaes.spotify.webapi.android.models.Artist;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ArtistFilterFragment extends Fragment {
+public class ArtistFilterFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /** Log tag */
     private static final String LOG_TAG = ArtistFilterFragment.class.getSimpleName();
 
+    /** Loader ID */
+    private static final int ARTIST_LOADER = 0;
+
     /** Adapter to deal with the list of artists */
-    private ArtistListViewAdapter mArtistListAdapter;
+    private ArtistAdapter mArtistAdapter;
 
     /** Reference to MainActivity */
     private MainActivity mMainActivity;
@@ -49,6 +65,12 @@ public class ArtistFilterFragment extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(ARTIST_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -57,11 +79,10 @@ public class ArtistFilterFragment extends Fragment {
         //gets a reference to the main activity
         mMainActivity = (MainActivity) this.getActivity();
 
-        //prepare the list view and adapter
-        mArtistListAdapter = new ArtistListViewAdapter(getActivity(),
-                R.layout.artistfilter_listitem, new ArrayList<Artist>());
+        //creates the adapter and sets into the list view
+        mArtistAdapter = new ArtistAdapter(getActivity(), null, 0);
         mArtistsListView = (ListView) rootView.findViewById(R.id.listview_artist);
-        mArtistsListView.setAdapter(mArtistListAdapter);
+        mArtistsListView.setAdapter(mArtistAdapter);
 
         //set the click listener to the list view
         mArtistsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -115,10 +136,30 @@ public class ArtistFilterFragment extends Fragment {
      * Updates the list of artists shown
      */
     private void updateArtistList() {
-
         //trigger the artist fetching
-        FetchArtistsTask artistsTask = new FetchArtistsTask(this, mArtistListAdapter,
+        FetchArtistsTask artistsTask = new FetchArtistsTask(getActivity(),
                 mMainActivity.getSpotifyAccessToken());
         artistsTask.execute(mArtistFilter);
+        getLoaderManager().restartLoader(ARTIST_LOADER, null, this);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        // Sort order:  Ascending, by name.
+        Log.v( LOG_TAG, "mArtistFilter = " + mArtistFilter);
+        String sortOrder = SpotifyStreamerContract.ArtistEntry.COLUMN_NAME + " ASC";
+        Uri artistByNameUri = SpotifyStreamerContract.ArtistEntry.buildArtistByName(mArtistFilter);
+        return new CursorLoader(getActivity(), artistByNameUri,
+                StreamerArtist.ARTIST_COLUMNS, null, null, sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mArtistAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mArtistAdapter.swapCursor(null);
     }
 }

@@ -1,10 +1,13 @@
-package com.danielviveiros.spotifystreamer;
+package com.danielviveiros.spotifystreamer.track;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.danielviveiros.spotifystreamer.R;
+import com.danielviveiros.spotifystreamer.main.SettingsActivity;
 
 
 public class TopTracksActivity extends AppCompatActivity {

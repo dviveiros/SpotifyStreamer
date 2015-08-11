@@ -49,7 +49,7 @@ public class SpotifyStreamerDBHelper extends SQLiteOpenHelper {
                         "FOREIGN KEY (" + TrackEntry.COLUMN_ARTIST_KEY + ") REFERENCES " +
                         ArtistEntry.TABLE_NAME + " (" + ArtistEntry._ID + "));";
 
-        Log.v( LOG_TAG, "Artist statement = " + SQL_CREATE_ARTIST_TABLE);
+        Log.v( LOG_TAG, "StreamerArtist statement = " + SQL_CREATE_ARTIST_TABLE);
         Log.v( LOG_TAG, "Track statement = " + SQL_CREATE_TRACK_TABLE );
 
         sqLiteDatabase.execSQL(SQL_CREATE_ARTIST_TABLE);

@@ -10,9 +10,9 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
-        <!-- Artist filter activity -->
+        <!-- StreamerArtist filter activity -->
         <activity
-            android:name=".MainActivity"
+            android:name=".main.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,12 +23,12 @@
 
         <!-- Top tracks activity -->
         <activity
-            android:name=".TopTracksActivity"
+            android:name=".track.TopTracksActivity"
             android:label="@string/title_activity_top_tracks"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".main.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="MainActivity" />
+                android:value=".main.MainActivity" />
         </activity>
 
         <!-- Spotify login activity, provided by spotify SDK
@@ -40,10 +40,13 @@
 
         <!-- Settings Activity -->
         <activity
-            android:name=".SettingsActivity"
+            android:name=".main.SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
 
+        <provider android:authorities="com.danielviveiros.spotifystreamer"
+            android:name=".data.SpotifyStreamerProvider">
+        </provider>
 
     </application>
 
