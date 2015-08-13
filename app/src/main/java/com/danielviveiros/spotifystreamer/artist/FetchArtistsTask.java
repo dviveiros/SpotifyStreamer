@@ -1,13 +1,11 @@
 package com.danielviveiros.spotifystreamer.artist;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import com.danielviveiros.spotifystreamer.data.SpotifyStreamerContract;
-import com.danielviveiros.spotifystreamer.data.SpotifyStreamerDBHelper;
 import com.danielviveiros.spotifystreamer.util.Utilities;
 
 import java.util.ArrayList;
@@ -22,7 +20,7 @@ import kaaes.spotify.webapi.android.models.ArtistsPager;
  * Async task to fetch Spotify artist data
  * Created by dviveiros on 23/06/15.
  */
-public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
+public class FetchArtistsTask extends AsyncTask<String, Void, List<ContentValues>> {
 
     /** Log tag */
     private final String LOG_TAG = FetchArtistsTask.class.getSimpleName();
@@ -31,25 +29,27 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
     private ArrayAdapter mAdapter;
     private String mAccessToken;
     private boolean mErrorState;
-    private Context mContext;
+    //private Context mContext;
 
     /**
      * Constructor
      */
-    public FetchArtistsTask( Context context, String accessToken ) {
-        //mArtistFilterFragment = artistFilterFragment;
+    public FetchArtistsTask( ArtistFilterFragment artistFilterFragment, String accessToken ) {
+        mArtistFilterFragment = artistFilterFragment;
         //mAdapter = adapter;
         mAccessToken = accessToken;
         mErrorState = false;
-        mContext = context;
+        //mContext = context;
     }
 
 
-    /*
     @Override
-    protected void onPostExecute() {
-        super.onPostExecute(artists);
+    protected void onPostExecute( List<ContentValues> values ) {
+        super.onPostExecute( values );
+        mArtistFilterFragment.restartLoader();
 
+
+        /*
         if (!mErrorState) {
             mAdapter.clear();
             if (artists.length > 0) {
@@ -71,11 +71,14 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
                     Toast.LENGTH_LONG);
             toast.show();
         }
+        */
     }
-    */
+
 
     @Override
-    protected Void doInBackground(String... params) {
+    protected List<ContentValues> doInBackground(String... params) {
+
+        Log.v( LOG_TAG, ">> FetchArtistsTask: doInBackground. Params.length() = " + params.length );
 
         List<ContentValues> artistsFound = new ArrayList<ContentValues>();
 
@@ -110,7 +113,7 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
                 deleteAllRecords();
                 ContentValues[] cvArray = artistsFound.toArray(
                         new ContentValues[ artistsFound.size()]);
-                inserted = mContext.getContentResolver().bulkInsert(
+                inserted = mArtistFilterFragment.getActivity().getContentResolver().bulkInsert(
                         SpotifyStreamerContract.ArtistEntry.CONTENT_URI, cvArray);
             }
 
@@ -123,12 +126,7 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
 
         }
 
-
-        /*
-        Artist[] result = artistsFound.toArray(new Artist[artistsFound.size()]);
-        return result;
-        */
-        return null;
+        return artistsFound;
     }
 
     /**
@@ -139,7 +137,9 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
         mContext.getContentResolver().delete(SpotifyStreamerContract.ArtistEntry.CONTENT_URI,
                 null, null);
                 */
+        /*
         SpotifyStreamerDBHelper helper = new SpotifyStreamerDBHelper(mContext);
         helper.getWritableDatabase().delete(SpotifyStreamerContract.ArtistEntry.TABLE_NAME, null, null);
+        */
     }
 }

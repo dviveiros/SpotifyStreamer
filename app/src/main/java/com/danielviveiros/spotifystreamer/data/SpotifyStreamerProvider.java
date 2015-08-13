@@ -48,9 +48,31 @@ public class SpotifyStreamerProvider extends ContentProvider {
 
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
+            case ARTIST: {
+                retCursor = mDBHelper.getReadableDatabase().query(
+                        SpotifyStreamerContract.ArtistEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+            }
             case ARTIST_BY_NAME: {
                 retCursor = getArtistByName( uri, projection, sortOrder );
                 break;
+            }
+            case TRACK: {
+                retCursor = mDBHelper.getReadableDatabase().query(
+                        SpotifyStreamerContract.TrackEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
             }
             case TRACKS_BY_ARTIST: {
                 retCursor = getTrackByArtist( uri, projection, sortOrder );
@@ -218,7 +240,9 @@ public class SpotifyStreamerProvider extends ContentProvider {
         String artistName = ArtistEntry.getArtistNameFromUri(uri);
         Log.v(LOG_TAG, "StreamerArtist name to be used in the filter = " + artistName);
 
-        return mDBHelper.getReadableDatabase().query(
+
+
+        Cursor cursor = mDBHelper.getReadableDatabase().query(
                 ArtistEntry.TABLE_NAME,
                 projection,
                 ArtistEntry.TABLE_NAME + "." + ArtistEntry.COLUMN_NAME + " like ?",
@@ -226,6 +250,9 @@ public class SpotifyStreamerProvider extends ContentProvider {
                 null,
                 null,
                 sortOrder);
+
+        Log.v( LOG_TAG, "getArtistByName(): returning " + cursor.getCount() + " artists");
+        return cursor;
     }
 
     private Cursor getTrackByArtist( Uri uri, String[] projection, String sortOrder) {

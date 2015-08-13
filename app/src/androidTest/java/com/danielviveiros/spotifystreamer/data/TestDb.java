@@ -5,6 +5,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 
+import com.danielviveiros.spotifystreamer.artist.StreamerArtist;
+import com.danielviveiros.spotifystreamer.artist.StreamerArtistDAO;
+
 import java.util.HashSet;
 
 /**
@@ -88,13 +91,10 @@ public class TestDb extends AndroidTestCase {
         db.close();
     }
 
-    /*
-        Students:  Here is where you will build code to test that we can insert and query the
-        location database.  We've done a lot of work for you.  You'll want to look in TestUtilities
-        where you can uncomment out the "createNorthPoleLocationValues" function.  You can
-        also make use of the ValidateCurrentRecord function from within TestUtilities.
-    */
-    public void testLocationTable() {
+    /**
+     * Test tracks table
+     */
+    public void testTracksTable() {
         // First step: Get reference to writable database
         SQLiteDatabase db = new SpotifyStreamerDBHelper(
                 this.mContext).getWritableDatabase();
@@ -123,6 +123,40 @@ public class TestDb extends AndroidTestCase {
         cursor.close();
         db.close();
 
+    }
+
+    /**
+     * Test artists table
+     */
+    public void testArtistsTable() {
+
+        StreamerArtistDAO artistDAO = StreamerArtistDAO.getInstance( getContext() );
+
+        StreamerArtist artist = TestUtilities.createFakeArtist( "Madonna" );
+        Long id = artistDAO.insert( artist );
+        assertNotNull(id);
+        assertTrue(id > 0);
+
+        artist = TestUtilities.createFakeArtist( "Madonna Dan" );
+        id = artistDAO.insert( artist );
+        assertNotNull(id);
+        assertTrue(id > 0);
+
+        artist = TestUtilities.createFakeArtist( "Led Zepelin" );
+        id = artistDAO.insert( artist );
+        assertNotNull(id);
+        assertTrue(id > 0);
+
+        Cursor cursor = StreamerArtistDAO.getInstance(getContext()).findArtistsByNamePrefix( "Madonna" );
+        assertEquals(2, cursor.getCount());
+
+        // Move the cursor to a valid database row
+        assertTrue(cursor.moveToFirst());
+
+        // Validate data in resulting Cursor with the original ContentValues
+        // (you can use the validateCurrentRecord function in TestUtilities to validate the
+        // query if you like)
+        assertEquals("Madonna", cursor.getString(1));
     }
 
 }

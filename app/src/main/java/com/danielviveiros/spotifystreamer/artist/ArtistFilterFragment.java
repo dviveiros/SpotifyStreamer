@@ -66,6 +66,7 @@ public class ArtistFilterFragment extends Fragment
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        Log.v( LOG_TAG, ">> onActivityCreated(): Initializing loader" );
         getLoaderManager().initLoader(ARTIST_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
@@ -125,6 +126,31 @@ public class ArtistFilterFragment extends Fragment
         return rootView;
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v( LOG_TAG, ">> onCreateLoader(): mArtistFilter = " + mArtistFilter);
+
+        String selection = SpotifyStreamerContract.ArtistEntry.COLUMN_NAME + " like ?";
+        String[] selectionArgs = new String[] { mArtistFilter + "%" };
+        String sortOrder = SpotifyStreamerContract.ArtistEntry.COLUMN_NAME + " ASC";
+        //Uri artistByNameUri = SpotifyStreamerContract.ArtistEntry.buildArtistByName(mArtistFilter);
+        Uri artistByNameUri = SpotifyStreamerContract.ArtistEntry.CONTENT_URI;
+        return new CursorLoader(getActivity(), artistByNameUri,
+                StreamerArtist.ARTIST_COLUMNS, selection, selectionArgs, sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.v(LOG_TAG, ">> onLoadFinished(): data.size = " + data.getCount());
+        mArtistAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        Log.v( LOG_TAG, ">> onLoaderReset()");
+        mArtistAdapter.swapCursor(null);
+    }
+
     /**
      * Redefines the artist list
      */
@@ -137,29 +163,15 @@ public class ArtistFilterFragment extends Fragment
      */
     private void updateArtistList() {
         //trigger the artist fetching
-        FetchArtistsTask artistsTask = new FetchArtistsTask(getActivity(),
+        FetchArtistsTask artistsTask = new FetchArtistsTask(this,
                 mMainActivity.getSpotifyAccessToken());
         artistsTask.execute(mArtistFilter);
-        getLoaderManager().restartLoader(ARTIST_LOADER, null, this);
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        // Sort order:  Ascending, by name.
-        Log.v( LOG_TAG, "mArtistFilter = " + mArtistFilter);
-        String sortOrder = SpotifyStreamerContract.ArtistEntry.COLUMN_NAME + " ASC";
-        Uri artistByNameUri = SpotifyStreamerContract.ArtistEntry.buildArtistByName(mArtistFilter);
-        return new CursorLoader(getActivity(), artistByNameUri,
-                StreamerArtist.ARTIST_COLUMNS, null, null, sortOrder);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mArtistAdapter.swapCursor(data);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mArtistAdapter.swapCursor(null);
+    /**
+     * Restarts the loader
+     */
+    void restartLoader() {
+        this.getLoaderManager().restartLoader(ArtistFilterFragment.ARTIST_LOADER, null, this);
     }
 }
