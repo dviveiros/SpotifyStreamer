@@ -31,12 +31,14 @@
                 android:value=".main.MainActivity" />
         </activity>
 
-        <!-- Spotify login activity, provided by spotify SDK
+        <!--
+        Spotify login activity, provided by spotify SDK
         <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
         </activity>
         -->
+
 
         <!-- Settings Activity -->
         <activity
@@ -44,10 +46,15 @@
             android:label="@string/title_activity_settings" >
         </activity>
 
-        <provider android:authorities="com.danielviveiros.spotifystreamer"
-            android:name=".data.SpotifyStreamerProvider">
+        <provider
+            android:name=".data.SpotifyStreamerProvider"
+            android:authorities="com.danielviveiros.spotifystreamer" >
         </provider>
 
+        <activity
+            android:name=".PlayerActivity"
+            android:label="@string/title_activity_player" >
+        </activity>
     </application>
 
 </manifest>
