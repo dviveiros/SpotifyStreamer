@@ -147,7 +147,7 @@ public class TestDb extends AndroidTestCase {
         assertNotNull(id);
         assertTrue(id > 0);
 
-        Cursor cursor = StreamerArtistDAO.getInstance(getContext()).findArtistsByNamePrefix( "Madonna" );
+        Cursor cursor = artistDAO.findArtistsByNamePrefix("Madonna");
         assertEquals(2, cursor.getCount());
 
         // Move the cursor to a valid database row
@@ -157,6 +157,10 @@ public class TestDb extends AndroidTestCase {
         // (you can use the validateCurrentRecord function in TestUtilities to validate the
         // query if you like)
         assertEquals("Madonna", cursor.getString(1));
+
+        artistDAO.deleteAll();
+        cursor = artistDAO.findArtistsByNamePrefix( "Madonna" );
+        assertEquals(0, cursor.getCount());
     }
 
 }

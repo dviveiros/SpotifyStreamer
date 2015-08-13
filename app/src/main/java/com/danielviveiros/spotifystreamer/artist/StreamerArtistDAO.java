@@ -82,4 +82,16 @@ public class StreamerArtistDAO {
         return id;
     }
 
+    /**
+     * Remove all data from the database
+     */
+    public void deleteAll() {
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        try {
+            db.delete(SpotifyStreamerContract.ArtistEntry.TABLE_NAME, null, null);
+        } finally {
+            db.close();
+        }
+    }
+
 }
