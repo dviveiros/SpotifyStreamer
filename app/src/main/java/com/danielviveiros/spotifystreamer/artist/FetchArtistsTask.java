@@ -53,7 +53,6 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
             Toast noItensToast = Toast.makeText(mArtistFilterFragment.getActivity(),
                     msgNotFound, Toast.LENGTH_LONG);
             noItensToast.show();
-            mArtistFilterFragment.setArtistList(new ArrayList<Artist>());
         } else {
             mArtistFilterFragment.restartLoader();
         }
@@ -87,7 +86,9 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
                 mNotFound = true;
             }
             for (Artist artist : artistsPager.artists.items) {
-                StreamerArtist streamerArtist = new StreamerArtist( artist.name,
+                StreamerArtist streamerArtist = new StreamerArtist(
+                        artist.id,
+                        artist.name,
                         Utilities.getSmallerImage(artist.images));
                 artistsFound.add(streamerArtist);
             }
@@ -95,7 +96,7 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
             // add to database
             int inserted = 0;
             if ( artistsFound.size() > 0 ) {
-                artistDAO.deleteAll();
+                //artistDAO.deleteAll();
                 inserted = artistDAO.bulkInsert(artistsFound);
             }
 

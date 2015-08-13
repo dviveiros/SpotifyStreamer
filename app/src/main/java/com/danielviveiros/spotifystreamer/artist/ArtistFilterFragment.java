@@ -90,6 +90,9 @@ public class ArtistFilterFragment extends Fragment
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
+                if (cursor != null)
+
                 if (mArtistList != null) {
                     Artist artist = mArtistList.get(i);
                     Intent detailIntent = new Intent(getActivity(), TopTracksActivity.class)
@@ -151,13 +154,6 @@ public class ArtistFilterFragment extends Fragment
      */
     void restartLoader() {
         this.getLoaderManager().restartLoader(ArtistFilterFragment.ARTIST_LOADER, null, this);
-    }
-
-    /**
-     * Redefines the artist list
-     */
-    protected void setArtistList( List<Artist> artistList ) {
-        this.mArtistList = artistList;
     }
 
     /**

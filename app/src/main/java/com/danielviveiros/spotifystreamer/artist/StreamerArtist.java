@@ -10,14 +10,16 @@ import android.database.Cursor;
 public class StreamerArtist {
 
     private Integer id;
+    private String key;
     private String name;
     private String imageUrl;
 
     /**
      * Constructor
      */
-    public StreamerArtist(String name, String imageUrl) {
+    public StreamerArtist(String key, String name, String imageUrl) {
         this.id = null;
+        this.key = key;
         this.name = name;
         this.imageUrl = imageUrl;
     }
@@ -26,7 +28,7 @@ public class StreamerArtist {
      * Constructor
      */
     public StreamerArtist(Cursor cursor) {
-        this.id = cursor.getInt( ArtistRepository.COL_INDEX_ID );
+        this.id = cursor.getInt(ArtistRepository.COL_INDEX_ID);
         this.name = cursor.getString(ArtistRepository.COL_INDEX_NAME);
         this.imageUrl = cursor.getString( ArtistRepository.COL_INDEX_IMAGE_URL );
     }
@@ -55,10 +57,20 @@ public class StreamerArtist {
         this.imageUrl = imageUrl;
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     @Override
     public String toString() {
         return "StreamerArtist{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", key='" + key + '\'' +
+                ", name='" + name + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
                 '}';
     }

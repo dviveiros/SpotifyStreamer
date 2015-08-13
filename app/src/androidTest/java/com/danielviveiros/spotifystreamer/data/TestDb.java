@@ -119,7 +119,7 @@ public class TestDb extends AndroidTestCase {
         // Validate data in resulting Cursor with the original ContentValues
         // (you can use the validateCurrentRecord function in TestUtilities to validate the
         // query if you like)
-        assertEquals("Track Name", cursor.getString(2));
+        assertEquals("Track Name", cursor.getString(3));
 
         // Finally, close the cursor and database
         cursor.close();
@@ -158,7 +158,7 @@ public class TestDb extends AndroidTestCase {
         // Validate data in resulting Cursor with the original ContentValues
         // (you can use the validateCurrentRecord function in TestUtilities to validate the
         // query if you like)
-        assertEquals("Madonna", cursor.getString(1));
+        assertEquals("Madonna", cursor.getString(ArtistRepository.COL_INDEX_NAME));
 
         artistDAO.deleteAll();
         cursor = artistDAO.findArtistsByNamePrefix( "Madonna" );

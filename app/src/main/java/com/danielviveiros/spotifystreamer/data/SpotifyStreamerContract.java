@@ -34,11 +34,13 @@ public class SpotifyStreamerContract {
 
         public static final String TABLE_NAME = "artist";
 
-        //StreamerArtist ID
+        //Artist ID
         public static final String COLUMN_ID = "id";
-        //StreamerArtist name
+        //Artist Key
+        public static final String COLUMN_KEY = "key";
+        //Artist name
         public static final String COLUMN_NAME = "name";
-        //StreamerArtist image URL
+        //Artist image URL
         public static final String COLUMN_IMAGE_URL = "image_url";
 
         public static final Uri CONTENT_URI =
@@ -71,8 +73,10 @@ public class SpotifyStreamerContract {
 
         //Track ID
         public static final String COLUMN_ID = "id";
-        //StreamerArtist FK
+        //Artist FK
         public static final String COLUMN_ARTIST_KEY = "artist_id";
+        //Track key
+        public static final String COLUMN_KEY = "key";
         //Track name
         public static final String COLUMN_NAME = "name";
         //Album name

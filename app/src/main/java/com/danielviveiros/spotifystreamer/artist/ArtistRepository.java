@@ -18,12 +18,14 @@ public class ArtistRepository {
 
     /** Column indexes on database */
     public static final int COL_INDEX_ID = 0;
-    public static final int COL_INDEX_NAME = 1;
-    public static final int COL_INDEX_IMAGE_URL = 2;
+    public static final int COL_INDEX_KEY = 1;
+    public static final int COL_INDEX_NAME = 2;
+    public static final int COL_INDEX_IMAGE_URL = 3;
 
     /** FULL PROJECTION */
     public static final String[] FULL_PROJECTION = {
             SpotifyStreamerContract.ArtistEntry.TABLE_NAME + "." + SpotifyStreamerContract.ArtistEntry._ID,
+            SpotifyStreamerContract.ArtistEntry.COLUMN_KEY,
             SpotifyStreamerContract.ArtistEntry.COLUMN_NAME,
             SpotifyStreamerContract.ArtistEntry.COLUMN_IMAGE_URL
     };
@@ -78,6 +80,7 @@ public class ArtistRepository {
 
         try {
             ContentValues values = new ContentValues();
+            values.put(SpotifyStreamerContract.ArtistEntry.COLUMN_KEY, artist.getKey());
             values.put(SpotifyStreamerContract.ArtistEntry.COLUMN_NAME, artist.getName());
             values.put(SpotifyStreamerContract.ArtistEntry.COLUMN_IMAGE_URL, artist.getImageUrl());
             id = db.insert(SpotifyStreamerContract.ArtistEntry.TABLE_NAME, null, values);
@@ -100,6 +103,7 @@ public class ArtistRepository {
         try {
             for ( StreamerArtist artist: artistList ) {
                 ContentValues values = new ContentValues();
+                values.put(SpotifyStreamerContract.ArtistEntry.COLUMN_KEY, artist.getKey());
                 values.put(SpotifyStreamerContract.ArtistEntry.COLUMN_NAME, artist.getName());
                 values.put(SpotifyStreamerContract.ArtistEntry.COLUMN_IMAGE_URL, artist.getImageUrl());
                 long id = db.insert(SpotifyStreamerContract.ArtistEntry.TABLE_NAME, null, values);

@@ -19,6 +19,7 @@ public class TestUtilities {
     public static ContentValues createFakeTrack() {
         ContentValues testValues = new ContentValues();
         testValues.put(SpotifyStreamerContract.TrackEntry.COLUMN_ARTIST_KEY, 123);
+        testValues.put(SpotifyStreamerContract.TrackEntry.COLUMN_KEY, "abc123");
         testValues.put(SpotifyStreamerContract.TrackEntry.COLUMN_NAME, "Track Name");
         testValues.put(SpotifyStreamerContract.TrackEntry.COLUMN_ALBUM_NAME, "Album Name");
         testValues.put(SpotifyStreamerContract.TrackEntry.COLUMN_IMAGE_URL, "Image URL");
@@ -31,7 +32,7 @@ public class TestUtilities {
      * @return fake data for tracks
      */
     public static StreamerArtist createFakeArtist( String name ) {
-        StreamerArtist artist = new StreamerArtist(name, Constants.DEFAULT_IMAGE);
+        StreamerArtist artist = new StreamerArtist(name + "_key", name, Constants.DEFAULT_IMAGE);
         return artist;
     }
 }
