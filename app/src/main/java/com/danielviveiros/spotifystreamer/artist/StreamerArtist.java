@@ -2,8 +2,6 @@ package com.danielviveiros.spotifystreamer.artist;
 
 import android.database.Cursor;
 
-import com.danielviveiros.spotifystreamer.data.SpotifyStreamerContract;
-
 /**
  * StreamerArtist from Spotify
  *
@@ -14,18 +12,6 @@ public class StreamerArtist {
     private Integer id;
     private String name;
     private String imageUrl;
-
-    /** Column indexes on database */
-    public static final int COL_INDEX_ID = 0;
-    public static final int COL_INDEX_NAME = 1;
-    public static final int COL_INDEX_IMAGE_URL = 2;
-
-    /** Table columns */
-    public static final String[] ARTIST_COLUMNS = {
-            SpotifyStreamerContract.ArtistEntry.TABLE_NAME + "." + SpotifyStreamerContract.ArtistEntry._ID,
-            SpotifyStreamerContract.ArtistEntry.COLUMN_NAME,
-            SpotifyStreamerContract.ArtistEntry.COLUMN_IMAGE_URL
-    };
 
     /**
      * Constructor
@@ -40,9 +26,9 @@ public class StreamerArtist {
      * Constructor
      */
     public StreamerArtist(Cursor cursor) {
-        this.id = cursor.getInt( StreamerArtist.COL_INDEX_ID );
-        this.name = cursor.getString(StreamerArtist.COL_INDEX_NAME);
-        this.imageUrl = cursor.getString( StreamerArtist.COL_INDEX_IMAGE_URL );
+        this.id = cursor.getInt( ArtistRepository.COL_INDEX_ID );
+        this.name = cursor.getString(ArtistRepository.COL_INDEX_NAME);
+        this.imageUrl = cursor.getString( ArtistRepository.COL_INDEX_IMAGE_URL );
     }
 
     public Integer getId() {

@@ -2,8 +2,9 @@ package com.danielviveiros.spotifystreamer.artist;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
+import com.danielviveiros.spotifystreamer.R;
 import com.danielviveiros.spotifystreamer.util.Utilities;
 
 import java.util.ArrayList;
@@ -27,59 +28,44 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
     private ArtistRepository artistDAO;
 
     private ArtistFilterFragment mArtistFilterFragment;
-    private ArrayAdapter mAdapter;
-    private String mAccessToken;
     private boolean mErrorState;
-    //private Context mContext;
+    private boolean mNotFound;
 
     /**
      * Constructor
      */
-    public FetchArtistsTask( ArtistFilterFragment artistFilterFragment, String accessToken ) {
+    public FetchArtistsTask( ArtistFilterFragment artistFilterFragment ) {
         mArtistFilterFragment = artistFilterFragment;
-        //mAdapter = adapter;
-        mAccessToken = accessToken;
         mErrorState = false;
-        //mContext = context;
-
+        mNotFound = false;
         artistDAO = ArtistRepository.getInstance(artistFilterFragment.getActivity());
     }
 
     @Override
     protected void onPostExecute( Void v ) {
-        mArtistFilterFragment.restartLoader();
-
-        /*
-        if (!mErrorState) {
-            mAdapter.clear();
-            if (artists.length > 0) {
-                List<Artist> artistList = new ArrayList<Artist>(Arrays.asList(artists));
-                for (Artist artist : artistList) {
-                    mAdapter.add(artist);
-                }
-                mArtistFilterFragment.setArtistList(artistList);
-            } else {
-                String msgNotFound = mArtistFilterFragment.getResources().getString(R.string.artist_filter_not_found);
-                Toast noItensToast = Toast.makeText(mArtistFilterFragment.getActivity(),
-                        msgNotFound, Toast.LENGTH_LONG);
-                noItensToast.show();
-                mArtistFilterFragment.setArtistList(new ArrayList<Artist>());
-            }
-        } else {
+        if (mErrorState) {
             Toast toast = Toast.makeText(mArtistFilterFragment.getActivity().getBaseContext(),
                     mArtistFilterFragment.getResources().getText(R.string.artist_filter_error),
                     Toast.LENGTH_LONG);
             toast.show();
+        } else if (mNotFound) {
+            String msgNotFound = mArtistFilterFragment.getResources().getString(R.string.artist_filter_not_found);
+            Toast noItensToast = Toast.makeText(mArtistFilterFragment.getActivity(),
+                    msgNotFound, Toast.LENGTH_LONG);
+            noItensToast.show();
+            mArtistFilterFragment.setArtistList(new ArrayList<Artist>());
+        } else {
+            mArtistFilterFragment.restartLoader();
         }
-        */
     }
 
     @Override
     protected Void doInBackground(String... params) {
 
-        Log.v( LOG_TAG, ">> FetchArtistsTask: doInBackground. Params.length() = " + params.length );
+        mErrorState = false;
+        mNotFound = false;
 
-        List<StreamerArtist> artistsFound = new ArrayList<StreamerArtist>();
+        List<StreamerArtist> artistsFound = new ArrayList<>();
 
         String artistFilter;
         if (params.length == 1) {
@@ -94,21 +80,15 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
         SpotifyApi api = new SpotifyApi();
 
         try {
-            api.setAccessToken(mAccessToken);
             SpotifyService spotify = api.getService();
 
             ArtistsPager artistsPager = spotify.searchArtists(artistFilter);
+            if (artistsPager.artists.items.size() == 0) {
+                mNotFound = true;
+            }
             for (Artist artist : artistsPager.artists.items) {
                 StreamerArtist streamerArtist = new StreamerArtist( artist.name,
                         Utilities.getSmallerImage(artist.images));
-
-                /*
-                ContentValues artistValues = new ContentValues();
-                artistValues.put(SpotifyStreamerContract.ArtistEntry.COLUMN_NAME, artist.name);
-                artistValues.put(SpotifyStreamerContract.ArtistEntry.COLUMN_IMAGE_URL,
-                        Utilities.getSmallerImage(artist.images));
-                        */
-
                 artistsFound.add(streamerArtist);
             }
 
@@ -117,24 +97,15 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
             if ( artistsFound.size() > 0 ) {
                 artistDAO.deleteAll();
                 inserted = artistDAO.bulkInsert(artistsFound);
-                /*
-                ContentValues[] cvArray = artistsFound.toArray(
-                        new ContentValues[ artistsFound.size()]);
-                inserted = mArtistFilterFragment.getActivity().getContentResolver().bulkInsert(
-                        SpotifyStreamerContract.ArtistEntry.CONTENT_URI, cvArray);
-                        */
             }
 
             Log.d(LOG_TAG, "FetchArtists Complete. " + inserted + " Inserted");
-
         } catch ( Exception exc ) {
             //handles exception connecting to spotify
             Log.e(LOG_TAG, exc.getMessage(), exc);
             mErrorState = true;
-
         }
 
-        //return artistsFound;
         return null;
     }
 }

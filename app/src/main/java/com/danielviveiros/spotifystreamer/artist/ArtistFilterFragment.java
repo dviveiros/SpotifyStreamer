@@ -128,25 +128,21 @@ public class ArtistFilterFragment extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v(LOG_TAG, ">> onCreateLoader(): mArtistFilter = " + mArtistFilter);
-
         String selection = SpotifyStreamerContract.ArtistEntry.COLUMN_NAME + " like ?";
         String[] selectionArgs = new String[] { mArtistFilter + "%" };
         String sortOrder = SpotifyStreamerContract.ArtistEntry.COLUMN_NAME + " ASC";
         Uri artistByNameUri = SpotifyStreamerContract.ArtistEntry.buildArtistByName(mArtistFilter);
         return new CursorLoader(getActivity(), artistByNameUri,
-                StreamerArtist.ARTIST_COLUMNS, selection, selectionArgs, sortOrder);
+                ArtistRepository.FULL_PROJECTION, selection, selectionArgs, sortOrder);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.v(LOG_TAG, ">> onLoadFinished(): data.size = " + data.getCount());
         mArtistAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.v( LOG_TAG, ">> onLoaderReset()");
         mArtistAdapter.swapCursor(null);
     }
 
@@ -169,10 +165,8 @@ public class ArtistFilterFragment extends Fragment
      */
     private void updateArtistList() {
         //trigger the artist fetching
-        FetchArtistsTask artistsTask = new FetchArtistsTask(this,
-                mMainActivity.getSpotifyAccessToken());
+        FetchArtistsTask artistsTask = new FetchArtistsTask(this);
         artistsTask.execute(mArtistFilter);
-        //restartLoader();
     }
 
 }

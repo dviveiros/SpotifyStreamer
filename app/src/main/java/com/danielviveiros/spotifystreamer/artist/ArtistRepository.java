@@ -16,6 +16,11 @@ import java.util.List;
  */
 public class ArtistRepository {
 
+    /** Column indexes on database */
+    public static final int COL_INDEX_ID = 0;
+    public static final int COL_INDEX_NAME = 1;
+    public static final int COL_INDEX_IMAGE_URL = 2;
+
     /** FULL PROJECTION */
     public static final String[] FULL_PROJECTION = {
             SpotifyStreamerContract.ArtistEntry.TABLE_NAME + "." + SpotifyStreamerContract.ArtistEntry._ID,
