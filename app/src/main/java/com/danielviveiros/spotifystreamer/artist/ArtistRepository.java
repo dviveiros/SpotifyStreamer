@@ -8,11 +8,13 @@ import android.database.sqlite.SQLiteDatabase;
 import com.danielviveiros.spotifystreamer.data.SpotifyStreamerContract;
 import com.danielviveiros.spotifystreamer.data.SpotifyStreamerDBHelper;
 
+import java.util.List;
+
 /**
  * DAO for StreamerArtist
  * Created by dviveiros on 12/08/15.
  */
-public class StreamerArtistDAO {
+public class ArtistRepository {
 
     /** FULL PROJECTION */
     public static final String[] FULL_PROJECTION = {
@@ -22,7 +24,7 @@ public class StreamerArtistDAO {
     };
 
     /** Singleton Instance */
-    private static StreamerArtistDAO mInstance;
+    private static ArtistRepository mInstance;
 
     /** Reference to DBHelper */
     private SpotifyStreamerDBHelper mDBHelper;
@@ -30,16 +32,16 @@ public class StreamerArtistDAO {
     /**
      * Constructor
      */
-    private StreamerArtistDAO(Context context) {
+    private ArtistRepository(Context context) {
         mDBHelper = new SpotifyStreamerDBHelper(context);
     }
 
     /**
      * Returns the singleton instance of this object
      */
-    public static StreamerArtistDAO getInstance( Context context ) {
+    public static ArtistRepository getInstance( Context context ) {
         if ( mInstance == null ) {
-            mInstance = new StreamerArtistDAO( context );
+            mInstance = new ArtistRepository( context );
         }
         return mInstance;
     }
@@ -53,7 +55,7 @@ public class StreamerArtistDAO {
         String sortOrder = SpotifyStreamerContract.ArtistEntry.COLUMN_NAME + " ASC";;
         return mDBHelper.getReadableDatabase().query(
                 SpotifyStreamerContract.ArtistEntry.TABLE_NAME,
-                StreamerArtistDAO.FULL_PROJECTION,
+                ArtistRepository.FULL_PROJECTION,
                 selection,
                 selectionArgs,
                 null,
@@ -73,13 +75,40 @@ public class StreamerArtistDAO {
             ContentValues values = new ContentValues();
             values.put(SpotifyStreamerContract.ArtistEntry.COLUMN_NAME, artist.getName());
             values.put(SpotifyStreamerContract.ArtistEntry.COLUMN_IMAGE_URL, artist.getImageUrl());
-            id = mDBHelper.getWritableDatabase().insert(
-                    SpotifyStreamerContract.ArtistEntry.TABLE_NAME, null, values);
+            id = db.insert(SpotifyStreamerContract.ArtistEntry.TABLE_NAME, null, values);
         } finally {
             db.close();
         }
 
         return id;
+    }
+
+    /**
+     * Bulk insert a list of artists into the database
+     * @return Number of insertions
+     */
+    public int bulkInsert(List<StreamerArtist> artistList) {
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        db.beginTransaction();
+        int returnCount = 0;
+
+        try {
+            for ( StreamerArtist artist: artistList ) {
+                ContentValues values = new ContentValues();
+                values.put(SpotifyStreamerContract.ArtistEntry.COLUMN_NAME, artist.getName());
+                values.put(SpotifyStreamerContract.ArtistEntry.COLUMN_IMAGE_URL, artist.getImageUrl());
+                long id = db.insert(SpotifyStreamerContract.ArtistEntry.TABLE_NAME, null, values);
+                if ( id > 0 ) {
+                    returnCount++;
+                }
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+
+        return returnCount;
     }
 
     /**

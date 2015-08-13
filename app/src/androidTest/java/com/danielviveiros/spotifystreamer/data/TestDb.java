@@ -5,10 +5,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 
+import com.danielviveiros.spotifystreamer.artist.ArtistRepository;
 import com.danielviveiros.spotifystreamer.artist.StreamerArtist;
-import com.danielviveiros.spotifystreamer.artist.StreamerArtistDAO;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Tests the database
@@ -130,20 +132,20 @@ public class TestDb extends AndroidTestCase {
      */
     public void testArtistsTable() {
 
-        StreamerArtistDAO artistDAO = StreamerArtistDAO.getInstance( getContext() );
+        ArtistRepository artistDAO = ArtistRepository.getInstance(getContext());
 
-        StreamerArtist artist = TestUtilities.createFakeArtist( "Madonna" );
-        Long id = artistDAO.insert( artist );
+        StreamerArtist artist1 = TestUtilities.createFakeArtist( "Madonna" );
+        Long id = artistDAO.insert(artist1);
         assertNotNull(id);
         assertTrue(id > 0);
 
-        artist = TestUtilities.createFakeArtist( "Madonna Dan" );
-        id = artistDAO.insert( artist );
+        StreamerArtist artist2 = TestUtilities.createFakeArtist( "Madonna Dan" );
+        id = artistDAO.insert( artist2 );
         assertNotNull(id);
         assertTrue(id > 0);
 
-        artist = TestUtilities.createFakeArtist( "Led Zepelin" );
-        id = artistDAO.insert( artist );
+        StreamerArtist artist3 = TestUtilities.createFakeArtist( "Led Zepelin" );
+        id = artistDAO.insert( artist3 );
         assertNotNull(id);
         assertTrue(id > 0);
 
@@ -161,6 +163,15 @@ public class TestDb extends AndroidTestCase {
         artistDAO.deleteAll();
         cursor = artistDAO.findArtistsByNamePrefix( "Madonna" );
         assertEquals(0, cursor.getCount());
+
+        List<StreamerArtist> listArtist = new ArrayList<StreamerArtist>();
+        listArtist.add( artist1 );
+        listArtist.add(artist2);
+        listArtist.add( artist3 );
+        int count = artistDAO.bulkInsert( listArtist );
+        assertEquals(3, count);
+        cursor = artistDAO.findArtistsByNamePrefix( "Madonna" );
+        assertEquals(2, cursor.getCount());
     }
 
 }

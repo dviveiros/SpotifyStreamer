@@ -128,13 +128,12 @@ public class ArtistFilterFragment extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v( LOG_TAG, ">> onCreateLoader(): mArtistFilter = " + mArtistFilter);
+        Log.v(LOG_TAG, ">> onCreateLoader(): mArtistFilter = " + mArtistFilter);
 
         String selection = SpotifyStreamerContract.ArtistEntry.COLUMN_NAME + " like ?";
         String[] selectionArgs = new String[] { mArtistFilter + "%" };
         String sortOrder = SpotifyStreamerContract.ArtistEntry.COLUMN_NAME + " ASC";
-        //Uri artistByNameUri = SpotifyStreamerContract.ArtistEntry.buildArtistByName(mArtistFilter);
-        Uri artistByNameUri = SpotifyStreamerContract.ArtistEntry.CONTENT_URI;
+        Uri artistByNameUri = SpotifyStreamerContract.ArtistEntry.buildArtistByName(mArtistFilter);
         return new CursorLoader(getActivity(), artistByNameUri,
                 StreamerArtist.ARTIST_COLUMNS, selection, selectionArgs, sortOrder);
     }
@@ -152,6 +151,13 @@ public class ArtistFilterFragment extends Fragment
     }
 
     /**
+     * Restarts the loader
+     */
+    void restartLoader() {
+        this.getLoaderManager().restartLoader(ArtistFilterFragment.ARTIST_LOADER, null, this);
+    }
+
+    /**
      * Redefines the artist list
      */
     protected void setArtistList( List<Artist> artistList ) {
@@ -166,12 +172,7 @@ public class ArtistFilterFragment extends Fragment
         FetchArtistsTask artistsTask = new FetchArtistsTask(this,
                 mMainActivity.getSpotifyAccessToken());
         artistsTask.execute(mArtistFilter);
+        //restartLoader();
     }
 
-    /**
-     * Restarts the loader
-     */
-    void restartLoader() {
-        this.getLoaderManager().restartLoader(ArtistFilterFragment.ARTIST_LOADER, null, this);
-    }
 }
