@@ -78,7 +78,7 @@ public class TestDb extends AndroidTestCase {
         locationColumnHashSet.add(SpotifyStreamerContract.TrackEntry.COLUMN_ARTIST_KEY);
         locationColumnHashSet.add(SpotifyStreamerContract.TrackEntry.COLUMN_NAME);
         locationColumnHashSet.add(SpotifyStreamerContract.TrackEntry.COLUMN_ALBUM_NAME);
-        locationColumnHashSet.add(SpotifyStreamerContract.TrackEntry.COLUMN_IMAGE_URL);
+        locationColumnHashSet.add(SpotifyStreamerContract.TrackEntry.COLUMN_ALBUM_IMAGE_URL);
 
         int columnNameIndex = c.getColumnIndex("name");
         do {

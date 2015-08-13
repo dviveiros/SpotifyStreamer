@@ -39,25 +39,39 @@ import kaaes.spotify.webapi.android.models.Artist;
 public class ArtistFilterFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    /** Log tag */
+    /**
+     * Log tag
+     */
     private static final String LOG_TAG = ArtistFilterFragment.class.getSimpleName();
 
-    /** Loader ID */
+    /**
+     * Loader ID
+     */
     private static final int ARTIST_LOADER = 0;
 
-    /** Adapter to deal with the list of artists */
+    /**
+     * Adapter to deal with the list of artists
+     */
     private ArtistAdapter mArtistAdapter;
 
-    /** Reference to MainActivity */
+    /**
+     * Reference to MainActivity
+     */
     private MainActivity mMainActivity;
 
-    /** List view */
+    /**
+     * List view
+     */
     private ListView mArtistsListView;
 
-    /** Filter */
+    /**
+     * Filter
+     */
     private String mArtistFilter;
 
-    /** List of artists being shown */
+    /**
+     * List of artists being shown
+     */
     private List<Artist> mArtistList;
 
     public ArtistFilterFragment() {
@@ -66,7 +80,7 @@ public class ArtistFilterFragment extends Fragment
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.v( LOG_TAG, ">> onActivityCreated(): Initializing loader" );
+        Log.v(LOG_TAG, ">> onActivityCreated(): Initializing loader");
         getLoaderManager().initLoader(ARTIST_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
@@ -91,14 +105,12 @@ public class ArtistFilterFragment extends Fragment
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
-                if (cursor != null)
-
-                if (mArtistList != null) {
-                    Artist artist = mArtistList.get(i);
+                if (cursor != null) {
+                    String artistKey = cursor.getString(ArtistRepository.COL_INDEX_KEY);
+                    String artistName = cursor.getString(ArtistRepository.COL_INDEX_NAME);
                     Intent detailIntent = new Intent(getActivity(), TopTracksActivity.class)
-                            .putExtra(Constants.ARTIST_ID_KEY, artist.id)
-                            .putExtra(Constants.ARTIST_NAME_KEY, artist.name)
-                            .putExtra(Constants.ACCESS_TOKEN_KEY, mMainActivity.getSpotifyAccessToken());
+                            .putExtra(Constants.ARTIST_ID_KEY, artistKey)
+                            .putExtra(Constants.ARTIST_NAME_KEY, artistName);
                     startActivity(detailIntent);
                 }
             }
@@ -132,7 +144,7 @@ public class ArtistFilterFragment extends Fragment
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String selection = SpotifyStreamerContract.ArtistEntry.COLUMN_NAME + " like ?";
-        String[] selectionArgs = new String[] { mArtistFilter + "%" };
+        String[] selectionArgs = new String[]{mArtistFilter + "%"};
         String sortOrder = SpotifyStreamerContract.ArtistEntry.COLUMN_NAME + " ASC";
         Uri artistByNameUri = SpotifyStreamerContract.ArtistEntry.buildArtistByName(mArtistFilter);
         return new CursorLoader(getActivity(), artistByNameUri,

@@ -4,13 +4,12 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.danielviveiros.spotifystreamer.R;
+import com.danielviveiros.spotifystreamer.util.Utilities;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,59 +23,50 @@ import kaaes.spotify.webapi.android.models.Tracks;
  * AsyncTask to fetch the top 10 tracks for a specific artist
  * Created by dviveiros on 24/06/15.
  */
-public class FetchTracksTask  extends AsyncTask<String, Void, Track[]> {
+public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
 
     /** Log tag */
     private final String LOG_TAG = FetchTracksTask.class.getSimpleName();
 
     private TopTracksFragment mTopTracksFragment;
-    private ArrayAdapter mAdapter;
-    private String mAccessToken;
     private boolean mErrorState;
+    private boolean mNotFound;
+    private TrackRepository trackRepository;
 
     /**
      * Constructor
-     * @param adapter Adapter to be populated after fetching the artist list
      *
      */
-    public FetchTracksTask( TopTracksFragment topTracksFragment, ArrayAdapter adapter, String accessToken ) {
+    public FetchTracksTask( TopTracksFragment topTracksFragment ) {
         mTopTracksFragment = topTracksFragment;
-        mAdapter = adapter;
-        mAccessToken = accessToken;
         mErrorState = false;
+        mNotFound = false;
+        trackRepository = trackRepository.getInstance( topTracksFragment.getActivity() );
     }
 
     @Override
-    protected void onPostExecute(Track[] tracks) {
-        super.onPostExecute(tracks);
+    protected void onPostExecute(Void v) {
+        super.onPostExecute(v);
 
-        if (!mErrorState) {
-            mAdapter.clear();
-            if (tracks.length > 0) {
-                List<Track> trackList = new ArrayList<Track>(Arrays.asList(tracks));
-                for (Track track : trackList) {
-                    mAdapter.add(track);
-                }
-                mTopTracksFragment.setTrackList(trackList);
-            } else {
-                String msgNotFound = mTopTracksFragment.getResources().getString(R.string.top_tracks_not_found);
-                Toast noItensToast = Toast.makeText(mTopTracksFragment.getActivity(),
-                        msgNotFound, Toast.LENGTH_LONG);
-                noItensToast.show();
-                mTopTracksFragment.setTrackList(new ArrayList<Track>());
-            }
-        } else {
+        if (mErrorState) {
             Toast toast = Toast.makeText(mTopTracksFragment.getActivity().getBaseContext(),
                     mTopTracksFragment.getResources().getText(R.string.top_tracks_filter_error),
                     Toast.LENGTH_LONG);
             toast.show();
+        } else if (mNotFound) {
+            String msgNotFound = mTopTracksFragment.getResources().getString(R.string.top_tracks_not_found);
+            Toast noItensToast = Toast.makeText(mTopTracksFragment.getActivity(),
+                    msgNotFound, Toast.LENGTH_LONG);
+            noItensToast.show();
+        } else {
+            mTopTracksFragment.restartLoader();
         }
     }
 
     @Override
-    protected Track[] doInBackground(String... params) {
+    protected Void doInBackground(String... params) {
 
-        List<Track> tracksFound = new ArrayList<Track>();
+        List<StreamerTrack> tracksFound = new ArrayList<StreamerTrack>();
 
         String artistId;
         if (params.length == 1) {
@@ -102,19 +92,30 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Track[]> {
         SpotifyApi api = new SpotifyApi();
 
         try {
-            api.setAccessToken(mAccessToken);
             SpotifyService spotify = api.getService();
             Tracks tracks = spotify.getArtistTopTrack(artistId, mapParams);
             for (Track track : tracks.tracks) {
-                tracksFound.add(track);
+                StreamerTrack streamerTrack = new StreamerTrack(
+                        artistId,
+                        track.id,
+                        track.name,
+                        track.album.name,
+                        Utilities.getSmallerImage(track.album.images));
+                tracksFound.add(streamerTrack);
             }
+
+            // add to database
+            int inserted = 0;
+            if ( tracksFound.size() > 0 ) {
+                inserted = trackRepository.bulkInsert(tracksFound);
+            }
+
+            Log.d(LOG_TAG, "FetchTracks Complete. " + inserted + " Inserted");
         } catch ( Exception exc ) {
             Log.e(LOG_TAG, exc.getMessage(), exc);
             mErrorState = true;
         }
 
-        Track[] result = tracksFound.toArray(new Track[tracksFound.size()]);
-
-        return result;
+        return null;
     }
 }

@@ -22,7 +22,7 @@ public class TestUtilities {
         testValues.put(SpotifyStreamerContract.TrackEntry.COLUMN_KEY, "abc123");
         testValues.put(SpotifyStreamerContract.TrackEntry.COLUMN_NAME, "Track Name");
         testValues.put(SpotifyStreamerContract.TrackEntry.COLUMN_ALBUM_NAME, "Album Name");
-        testValues.put(SpotifyStreamerContract.TrackEntry.COLUMN_IMAGE_URL, "Image URL");
+        testValues.put(SpotifyStreamerContract.TrackEntry.COLUMN_ALBUM_IMAGE_URL, "Image URL");
 
         return testValues;
     }

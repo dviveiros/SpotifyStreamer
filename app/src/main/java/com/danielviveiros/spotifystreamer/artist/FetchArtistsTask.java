@@ -25,7 +25,7 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
     private final String LOG_TAG = FetchArtistsTask.class.getSimpleName();
 
     /** Artist DAO */
-    private ArtistRepository artistDAO;
+    private ArtistRepository artistRepository;
 
     private ArtistFilterFragment mArtistFilterFragment;
     private boolean mErrorState;
@@ -38,7 +38,7 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
         mArtistFilterFragment = artistFilterFragment;
         mErrorState = false;
         mNotFound = false;
-        artistDAO = ArtistRepository.getInstance(artistFilterFragment.getActivity());
+        artistRepository = ArtistRepository.getInstance(artistFilterFragment.getActivity());
     }
 
     @Override
@@ -96,8 +96,8 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
             // add to database
             int inserted = 0;
             if ( artistsFound.size() > 0 ) {
-                //artistDAO.deleteAll();
-                inserted = artistDAO.bulkInsert(artistsFound);
+                //artistRepository.deleteAll();
+                inserted = artistRepository.bulkInsert(artistsFound);
             }
 
             Log.d(LOG_TAG, "FetchArtists Complete. " + inserted + " Inserted");

@@ -18,7 +18,7 @@ public class SpotifyStreamerDBHelper extends SQLiteOpenHelper {
     private static final String LOG_TAG = SpotifyStreamerDBHelper.class.getSimpleName();
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     static final String DATABASE_NAME = "spotifystreamer.db";
 
@@ -44,13 +44,13 @@ public class SpotifyStreamerDBHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_TRACK_TABLE =
                 "CREATE TABLE " + TrackEntry.TABLE_NAME + " (" +
                         TrackEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                        TrackEntry.COLUMN_ARTIST_KEY + " INTEGER NOT NULL," +
+                        TrackEntry.COLUMN_ARTIST_KEY + " TEXT NOT NULL," +
                         TrackEntry.COLUMN_KEY + " TEXT UNIQUE NOT NULL," +
                         TrackEntry.COLUMN_NAME + " TEXT NOT NULL," +
                         TrackEntry.COLUMN_ALBUM_NAME + " TEXT NOT NULL," +
-                        TrackEntry.COLUMN_IMAGE_URL + " TEXT NOT NULL ," +
+                        TrackEntry.COLUMN_ALBUM_IMAGE_URL + " TEXT NOT NULL ," +
                         "FOREIGN KEY (" + TrackEntry.COLUMN_ARTIST_KEY + ") REFERENCES " +
-                        ArtistEntry.TABLE_NAME + " (" + ArtistEntry._ID + "), " +
+                        ArtistEntry.TABLE_NAME + " (" + ArtistEntry.COLUMN_KEY + "), " +
                         " UNIQUE (" + TrackEntry.COLUMN_KEY + ") ON CONFLICT REPLACE);";
 
         Log.v( LOG_TAG, "StreamerArtist statement = " + SQL_CREATE_ARTIST_TABLE);

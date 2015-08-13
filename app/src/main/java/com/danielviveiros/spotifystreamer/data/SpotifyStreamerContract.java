@@ -82,7 +82,7 @@ public class SpotifyStreamerContract {
         //Album name
         public static final String COLUMN_ALBUM_NAME = "album_name";
         //Album artwork image URL
-        public static final String COLUMN_IMAGE_URL = "album_image_url";
+        public static final String COLUMN_ALBUM_IMAGE_URL = "album_image_url";
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_TRACK).build();
@@ -93,6 +93,10 @@ public class SpotifyStreamerContract {
 
         public static Uri buildTrackUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildTrackByArtistUri(String artistKey) {
+            return CONTENT_URI.buildUpon().appendPath(artistKey).build();
         }
 
         public static String getArtistIdFromUri(Uri uri) {
