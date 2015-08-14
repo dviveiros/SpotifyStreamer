@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.danielviveiros.spotifystreamer.R;
@@ -74,6 +75,22 @@ public class TopTracksFragment extends Fragment
         mTopTracksAdapter = new TopTracksAdapter(getActivity(), null, 0);
         mTopTracksListView = (ListView) rootView.findViewById(R.id.listview_toptracks);
         mTopTracksListView.setAdapter(mTopTracksAdapter);
+        //set the click listener to the list view
+        mTopTracksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
+                if (cursor != null) {
+                    long trackId = cursor.getLong(TrackRepository.COL_INDEX_ID);
+                    Uri uri = SpotifyStreamerContract.TrackEntry.buildTrackUri(trackId);
+                    Log.v( LOG_TAG, "Track selected = " + trackId );
+                    Intent playerlIntent = new Intent(getActivity(), PlayerActivity.class)
+                            .setData( uri );
+                    startActivity(playerlIntent);
+                }
+            }
+        });
 
         this.updateTopTracks();
         return rootView;
@@ -89,7 +106,7 @@ public class TopTracksFragment extends Fragment
      * Updates the list of top tracks
      */
     private void updateTopTracks() {
-        FetchTracksTask tracksTask = new FetchTracksTask(this);
+        FetchTracksTask tracksTask = new FetchTracksTask(this, mSelectedArtistName);
         tracksTask.execute(mSelectedArtistId);
     }
 

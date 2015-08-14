@@ -23,6 +23,10 @@ public class TrackRepository {
     public static final int COL_INDEX_NAME = 3;
     public static final int COL_INDEX_ALBUM_NAME = 4;
     public static final int COL_INDEX_ALBUM_IMAGE_URL = 5;
+    public static final int COL_INDEX_FULL_ALBUM_IMAGE_URL = 6;
+    public static final int COL_INDEX_DURATION = 7;
+    public static final int COL_INDEX_URL_PREVIEW = 8;
+    public static final int COL_INDEX_ARTIST_NAME = 9;
 
     /** FULL PROJECTION */
     public static final String[] FULL_PROJECTION = {
@@ -31,7 +35,11 @@ public class TrackRepository {
             SpotifyStreamerContract.TrackEntry.COLUMN_KEY,
             SpotifyStreamerContract.TrackEntry.COLUMN_NAME,
             SpotifyStreamerContract.TrackEntry.COLUMN_ALBUM_NAME,
-            SpotifyStreamerContract.TrackEntry.COLUMN_ALBUM_IMAGE_URL
+            SpotifyStreamerContract.TrackEntry.COLUMN_ALBUM_IMAGE_URL,
+            SpotifyStreamerContract.TrackEntry.COLUMN_FULL_ALBUM_IMAGE_URL,
+            SpotifyStreamerContract.TrackEntry.COLUMN_DURATION,
+            SpotifyStreamerContract.TrackEntry.COLUMN_PREVIEW_URL,
+            SpotifyStreamerContract.TrackEntry.COLUMN_ARTIST_NAME
     };
 
     /** Singleton Instance */
@@ -74,6 +82,10 @@ public class TrackRepository {
                 values.put(SpotifyStreamerContract.TrackEntry.COLUMN_NAME, track.getName());
                 values.put(SpotifyStreamerContract.TrackEntry.COLUMN_ALBUM_NAME, track.getAlbumName());
                 values.put(SpotifyStreamerContract.TrackEntry.COLUMN_ALBUM_IMAGE_URL, track.getAlbumImageUrl());
+                values.put(SpotifyStreamerContract.TrackEntry.COLUMN_FULL_ALBUM_IMAGE_URL, track.getAlbumFullImageUrl());
+                values.put(SpotifyStreamerContract.TrackEntry.COLUMN_DURATION, track.getDuration());
+                values.put(SpotifyStreamerContract.TrackEntry.COLUMN_PREVIEW_URL, track.getUrlPreview());
+                values.put(SpotifyStreamerContract.TrackEntry.COLUMN_ARTIST_NAME, track.getArtistName());
                 long id = db.insert(SpotifyStreamerContract.TrackEntry.TABLE_NAME, null, values);
                 if ( id > 0 ) {
                     returnCount++;

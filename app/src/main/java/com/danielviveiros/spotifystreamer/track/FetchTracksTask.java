@@ -32,16 +32,18 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
     private boolean mErrorState;
     private boolean mNotFound;
     private TrackRepository trackRepository;
+    private String mArtistName;
 
     /**
      * Constructor
      *
      */
-    public FetchTracksTask( TopTracksFragment topTracksFragment ) {
+    public FetchTracksTask( TopTracksFragment topTracksFragment, String artistName ) {
         mTopTracksFragment = topTracksFragment;
         mErrorState = false;
         mNotFound = false;
         trackRepository = trackRepository.getInstance( topTracksFragment.getActivity() );
+        mArtistName = artistName;
     }
 
     @Override
@@ -100,7 +102,11 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
                         track.id,
                         track.name,
                         track.album.name,
-                        Utilities.getSmallerImage(track.album.images));
+                        Utilities.getSmallerImage(track.album.images),
+                        Utilities.getLargerImage(track.album.images),
+                        track.duration_ms,
+                        track.preview_url,
+                        mArtistName);
                 tracksFound.add(streamerTrack);
             }
 

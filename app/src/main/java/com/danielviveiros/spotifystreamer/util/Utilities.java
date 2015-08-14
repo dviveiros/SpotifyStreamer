@@ -32,4 +32,26 @@ public class Utilities {
             return Constants.DEFAULT_IMAGE;
         }
     }
+
+    /**
+     * Gets the larger image to use as artist icon
+     */
+    public static String getLargerImage(List<Image> images) {
+
+        Image artistImage = null;
+
+        if ((images != null) && (images.size() > 0)) {
+            for ( Image image: images ) {
+                if (artistImage == null) {
+                    artistImage = image;
+                }
+                if (artistImage.height > image.height) {
+                    artistImage = image;
+                }
+            }
+            return artistImage.url;
+        } else {
+            return Constants.DEFAULT_IMAGE;
+        }
+    }
 }

@@ -18,7 +18,7 @@ public class SpotifyStreamerDBHelper extends SQLiteOpenHelper {
     private static final String LOG_TAG = SpotifyStreamerDBHelper.class.getSimpleName();
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
 
     static final String DATABASE_NAME = "spotifystreamer.db";
 
@@ -49,6 +49,10 @@ public class SpotifyStreamerDBHelper extends SQLiteOpenHelper {
                         TrackEntry.COLUMN_NAME + " TEXT NOT NULL," +
                         TrackEntry.COLUMN_ALBUM_NAME + " TEXT NOT NULL," +
                         TrackEntry.COLUMN_ALBUM_IMAGE_URL + " TEXT NOT NULL ," +
+                        TrackEntry.COLUMN_FULL_ALBUM_IMAGE_URL + " TEXT NOT NULL ," +
+                        TrackEntry.COLUMN_DURATION + " INTEGER," +
+                        TrackEntry.COLUMN_PREVIEW_URL + " TEXT," +
+                        TrackEntry.COLUMN_ARTIST_NAME + " TEXT NOT NULL," +
                         "FOREIGN KEY (" + TrackEntry.COLUMN_ARTIST_KEY + ") REFERENCES " +
                         ArtistEntry.TABLE_NAME + " (" + ArtistEntry.COLUMN_KEY + "), " +
                         " UNIQUE (" + TrackEntry.COLUMN_KEY + ") ON CONFLICT REPLACE);";

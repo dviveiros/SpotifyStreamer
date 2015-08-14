@@ -83,6 +83,14 @@ public class SpotifyStreamerContract {
         public static final String COLUMN_ALBUM_NAME = "album_name";
         //Album artwork image URL
         public static final String COLUMN_ALBUM_IMAGE_URL = "album_image_url";
+        //Album artwork FULL image URL
+        public static final String COLUMN_FULL_ALBUM_IMAGE_URL = "full_album_image_url";
+        //Track duration
+        public static final String COLUMN_DURATION = "duration";
+        //Track preview URL
+        public static final String COLUMN_PREVIEW_URL = "preview_url";
+        //Artist name
+        public static final String COLUMN_ARTIST_NAME = "artist_name";
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_TRACK).build();

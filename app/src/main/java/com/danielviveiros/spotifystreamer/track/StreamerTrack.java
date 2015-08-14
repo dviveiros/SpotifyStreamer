@@ -15,13 +15,23 @@ public class StreamerTrack {
     private String name;
     private String albumName;
     private String albumImageUrl;
+    private String albumFullImageUrl;
+    private Long duration;
+    private String urlPreview;
+    private String artistName;
 
-    public StreamerTrack( String artistKey, String key, String name, String albumName, String albumImageUrl ) {
+    public StreamerTrack( String artistKey, String key, String name, String albumName,
+                          String albumImageUrl, String albumFullImageUrl, Long duration, String urlPreview,
+                          String artistName) {
         this.artistKey = artistKey;
         this.key = key;
         this.name = name;
         this.albumName = albumName;
         this.albumImageUrl = albumImageUrl;
+        this.albumFullImageUrl = albumFullImageUrl;
+        this.duration = duration;
+        this.urlPreview = urlPreview;
+        this.artistName = artistName;
     }
 
     public StreamerTrack( Cursor cursor ) {
@@ -31,6 +41,10 @@ public class StreamerTrack {
         this.name = cursor.getString( TrackRepository.COL_INDEX_NAME );
         this.albumName = cursor.getString( TrackRepository.COL_INDEX_ALBUM_NAME );
         this.albumImageUrl = cursor.getString( TrackRepository.COL_INDEX_ALBUM_IMAGE_URL );
+        this.albumFullImageUrl = cursor.getString( TrackRepository.COL_INDEX_FULL_ALBUM_IMAGE_URL );
+        this.duration = cursor.getLong(TrackRepository.COL_INDEX_DURATION);
+        this.urlPreview = cursor.getString(TrackRepository.COL_INDEX_URL_PREVIEW);
+        this.artistName = cursor.getString( TrackRepository.COL_INDEX_ARTIST_NAME);
     }
 
     public String getAlbumImageUrl() {
@@ -81,6 +95,38 @@ public class StreamerTrack {
         this.albumName = albumName;
     }
 
+    public String getAlbumFullImageUrl() {
+        return albumFullImageUrl;
+    }
+
+    public void setAlbumFullImageUrl(String albumFullImageUrl) {
+        this.albumFullImageUrl = albumFullImageUrl;
+    }
+
+    public Long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Long duration) {
+        this.duration = duration;
+    }
+
+    public String getUrlPreview() {
+        return urlPreview;
+    }
+
+    public void setUrlPreview(String urlPreview) {
+        this.urlPreview = urlPreview;
+    }
+
+    public String getArtistName() {
+        return artistName;
+    }
+
+    public void setArtistName(String artistName) {
+        this.artistName = artistName;
+    }
+
     @Override
     public String toString() {
         return "StreamerTrack{" +
@@ -90,6 +136,10 @@ public class StreamerTrack {
                 ", name='" + name + '\'' +
                 ", albumName='" + albumName + '\'' +
                 ", albumImageUrl='" + albumImageUrl + '\'' +
+                ", albumFullImageUrl='" + albumFullImageUrl + '\'' +
+                ", duration=" + duration +
+                ", urlPreview='" + urlPreview + '\'' +
+                ", artistName='" + artistName + '\'' +
                 '}';
     }
 }
