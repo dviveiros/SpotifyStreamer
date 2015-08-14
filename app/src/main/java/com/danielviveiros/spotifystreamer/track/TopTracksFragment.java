@@ -80,13 +80,21 @@ public class TopTracksFragment extends Fragment
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
-                if (cursor != null) {
-                    long trackId = cursor.getLong(TrackRepository.COL_INDEX_ID);
-                    Uri uri = SpotifyStreamerContract.TrackEntry.buildTrackUri(trackId);
-                    Log.v( LOG_TAG, "Track selected = " + trackId );
-                    Intent playerlIntent = new Intent(getActivity(), PlayerActivity.class)
-                            .setData( uri );
+                Cursor data = (Cursor) adapterView.getItemAtPosition(i);
+                if (data != null) {
+                    String albumName = data.getString( TrackRepository.COL_INDEX_ALBUM_NAME );
+                    String albumImageUrl = data.getString( TrackRepository.COL_INDEX_FULL_ALBUM_IMAGE_URL );
+                    String trackName = data.getString( TrackRepository.COL_INDEX_NAME );
+                    String urlPreview = data.getString( TrackRepository.COL_INDEX_URL_PREVIEW );
+                    String artistName = data.getString( TrackRepository.COL_INDEX_ARTIST_NAME);
+
+                    Intent playerlIntent = new Intent(getActivity(), PlayerActivity.class);
+                    playerlIntent.putExtra(Constants.ARTIST_NAME_KEY, artistName);
+                    playerlIntent.putExtra( Constants.ALBUM_NAME_KEY, albumName);
+                    playerlIntent.putExtra( Constants.ALBUM_IMAGE_KEY, albumImageUrl);
+                    playerlIntent.putExtra( Constants.TRACK_NAME_KEY, trackName);
+                    playerlIntent.putExtra( Constants.URL_PREVIEW_KEY, urlPreview);
+
                     startActivity(playerlIntent);
                 }
             }

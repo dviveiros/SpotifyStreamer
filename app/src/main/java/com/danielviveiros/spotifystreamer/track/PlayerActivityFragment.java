@@ -1,12 +1,8 @@
 package com.danielviveiros.spotifystreamer.track;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,66 +10,55 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.danielviveiros.spotifystreamer.R;
+import com.danielviveiros.spotifystreamer.util.Constants;
 import com.squareup.picasso.Picasso;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PlayerActivityFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+public class PlayerActivityFragment extends Fragment {
 
     private static final int PLAYER_LOADER = 2;
+
+    private String mArtistName;
+    private String mTrackName;
+    private String mAlbumName;
+    private String mAlbumImageUrl;
+    private String mPreviewUrl;
 
     public PlayerActivityFragment() {
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        getLoaderManager().initLoader(PLAYER_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.player_fragment, container, false);
-    }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        View view = inflater.inflate(R.layout.player_fragment, container, false);
 
         Intent intent = getActivity().getIntent();
-        if (intent == null) {
-            return null;
-        }
+        mArtistName = intent.getStringExtra(Constants.ARTIST_NAME_KEY );
+        mTrackName = intent.getStringExtra(Constants.TRACK_NAME_KEY );
+        mAlbumName = intent.getStringExtra(Constants.ALBUM_NAME_KEY );
+        mAlbumImageUrl = intent.getStringExtra(Constants.ALBUM_IMAGE_KEY );
+        mPreviewUrl = intent.getStringExtra(Constants.URL_PREVIEW_KEY );
 
-        return new CursorLoader(getActivity(), intent.getData(),
-                TrackRepository.FULL_PROJECTION, null, null, null);
+        TextView artistTextView = (TextView) view.findViewById( R.id.artist_textview );
+        TextView albumTextView = (TextView) view.findViewById(R.id.album_textview);
+        TextView trackTextView = (TextView) view.findViewById(R.id.track_textview);
+        ImageView imageView = (ImageView) view.findViewById( R.id.album_artwork );
+
+        artistTextView.setText( mArtistName );
+        albumTextView.setText( mAlbumName );
+        trackTextView.setText( mTrackName );
+        Picasso.with(getActivity()).load(mAlbumImageUrl).into(imageView);
+
+        return view;
     }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (!data.moveToFirst()) {
-            return;
-        }
-        String albumName = data.getString( TrackRepository.COL_INDEX_ALBUM_NAME );
-        String albumImageUrl = data.getString( TrackRepository.COL_INDEX_FULL_ALBUM_IMAGE_URL );
-        String trackName = data.getString( TrackRepository.COL_INDEX_NAME );
-        String urlPreview = data.getString( TrackRepository.COL_INDEX_URL_PREVIEW );
-        String artistName = data.getString( TrackRepository.COL_INDEX_ARTIST_NAME);
 
-        TextView artistTextView = (TextView) getView().findViewById( R.id.artist_textview );
-        TextView albumTextView = (TextView) getView().findViewById( R.id.album_textview );
-        TextView trackTextView = (TextView) getView().findViewById( R.id.track_textview );
-        ImageView imageView = (ImageView) getView().findViewById( R.id.album_artwork );
-
-        artistTextView.setText( artistName );
-        albumTextView.setText( albumName );
-        trackTextView.setText( trackName );
-        Picasso.with(getActivity()).load(albumImageUrl).into(imageView);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-    }
 }
