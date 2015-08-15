@@ -75,8 +75,6 @@ public class TopTracksFragment extends Fragment
 
         View rootView = inflater.inflate(R.layout.toptracks_fragment, container, false);
 
-        mProgressDialog = ProgressDialog.show(getActivity(), "Please wait ...", "Fetching tracks ...", true);
-
         Intent intent = getActivity().getIntent();
         mSelectedArtistId = intent.getStringExtra(Constants.ARTIST_ID_KEY);
         mSelectedArtistName = intent.getStringExtra(Constants.ARTIST_NAME_KEY);
@@ -109,25 +107,25 @@ public class TopTracksFragment extends Fragment
 
                 Cursor data = (Cursor) adapterView.getItemAtPosition(i);
                 if (data != null) {
-                    String albumName = data.getString( TrackRepository.COL_INDEX_ALBUM_NAME );
-                    String albumImageUrl = data.getString( TrackRepository.COL_INDEX_FULL_ALBUM_IMAGE_URL );
-                    String trackName = data.getString( TrackRepository.COL_INDEX_NAME );
-                    String urlPreview = data.getString( TrackRepository.COL_INDEX_URL_PREVIEW );
-                    String artistName = data.getString( TrackRepository.COL_INDEX_ARTIST_NAME);
+                    String albumName = data.getString(TrackRepository.COL_INDEX_ALBUM_NAME);
+                    String albumImageUrl = data.getString(TrackRepository.COL_INDEX_FULL_ALBUM_IMAGE_URL);
+                    String trackName = data.getString(TrackRepository.COL_INDEX_NAME);
+                    String urlPreview = data.getString(TrackRepository.COL_INDEX_URL_PREVIEW);
+                    String artistName = data.getString(TrackRepository.COL_INDEX_ARTIST_NAME);
 
                     Intent playerlIntent = new Intent(getActivity(), PlayerActivity.class);
                     playerlIntent.putExtra(Constants.ARTIST_NAME_KEY, artistName);
-                    playerlIntent.putExtra( Constants.ALBUM_NAME_KEY, albumName);
-                    playerlIntent.putExtra( Constants.ALBUM_IMAGE_KEY, albumImageUrl);
-                    playerlIntent.putExtra( Constants.TRACK_NAME_KEY, trackName);
-                    playerlIntent.putExtra( Constants.URL_PREVIEW_KEY, urlPreview);
+                    playerlIntent.putExtra(Constants.ALBUM_NAME_KEY, albumName);
+                    playerlIntent.putExtra(Constants.ALBUM_IMAGE_KEY, albumImageUrl);
+                    playerlIntent.putExtra(Constants.TRACK_NAME_KEY, trackName);
+                    playerlIntent.putExtra(Constants.URL_PREVIEW_KEY, urlPreview);
 
                     startActivity(playerlIntent);
                 }
             }
         });
 
-        this.updateTopTracks();
+        //this.updateTopTracks();
         return rootView;
     }
 
@@ -141,6 +139,7 @@ public class TopTracksFragment extends Fragment
      * Updates the list of top tracks
      */
     private void updateTopTracks() {
+        mProgressDialog = ProgressDialog.show(getActivity(), "Please wait ...", "Fetching tracks ...", true);
         FetchTracksTask tracksTask = new FetchTracksTask(this, getArtistName());
         tracksTask.execute(getArtistId());
     }

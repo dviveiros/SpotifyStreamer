@@ -23,7 +23,7 @@ public class Utilities {
                 if (artistImage == null) {
                     artistImage = image;
                 }
-                if (artistImage.height < image.height) {
+                if (image.height < artistImage.height) {
                     artistImage = image;
                 }
             }
@@ -45,7 +45,7 @@ public class Utilities {
                 if (artistImage == null) {
                     artistImage = image;
                 }
-                if (artistImage.height > image.height) {
+                if (image.height > artistImage.height) {
                     artistImage = image;
                 }
             }
