@@ -1,14 +1,18 @@
 package com.danielviveiros.spotifystreamer.artist;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -74,6 +78,11 @@ public class ArtistFilterFragment extends Fragment
      */
     private List<Artist> mArtistList;
 
+    /**
+     * Progress dialog
+     */
+    private ProgressDialog mProgressDialog;
+
     public ArtistFilterFragment() {
         mArtistList = new ArrayList<Artist>();
     }
@@ -118,13 +127,29 @@ public class ArtistFilterFragment extends Fragment
 
         //set the listener for the edit text
         EditText artistEditText = (EditText) rootView.findViewById(R.id.artist_filter);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
+                getActivity().getBaseContext());
         artistEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
+
+                    //shows a "loading" dialog
+                    mProgressDialog = ProgressDialog.show(getActivity(), "Please wait ...", "Fetching artists ...", true);
                     getActivity().getCurrentFocus();
                     mArtistFilter = v.getText().toString();
+
+                    //saves the value in case the user hits the back button
+                    if (!TextUtils.isEmpty(mArtistFilter)) {
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
+                                getActivity().getBaseContext());
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("mArtistFilter", mArtistFilter);
+                        editor.commit();
+                    }
+
+                    //updates the list
                     updateArtistList();
 
                     //hide the keyboard
@@ -137,6 +162,13 @@ public class ArtistFilterFragment extends Fragment
                 return false;
             }
         });
+
+        //if there is a previously selected artist, define it and triggers the update
+        mArtistFilter = prefs.getString("mArtistFilter", null);
+        if (!TextUtils.isEmpty(mArtistFilter)) {
+            artistEditText.setText(mArtistFilter);
+            updateArtistList();
+        }
 
         return rootView;
     }
@@ -166,6 +198,9 @@ public class ArtistFilterFragment extends Fragment
      */
     void restartLoader() {
         this.getLoaderManager().restartLoader(ArtistFilterFragment.ARTIST_LOADER, null, this);
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+        }
     }
 
     /**
@@ -174,7 +209,16 @@ public class ArtistFilterFragment extends Fragment
     private void updateArtistList() {
         //trigger the artist fetching
         FetchArtistsTask artistsTask = new FetchArtistsTask(this);
-        artistsTask.execute(mArtistFilter);
+        artistsTask.execute(getArtistFilter());
+    }
+
+    String getArtistFilter() {
+        if ( TextUtils.isEmpty(mArtistFilter) ) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
+                    getActivity().getBaseContext());
+            mArtistFilter = prefs.getString("mArtistFilter", null);
+        }
+        return mArtistFilter;
     }
 
 }

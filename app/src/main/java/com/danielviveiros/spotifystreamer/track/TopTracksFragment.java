@@ -1,5 +1,6 @@
 package com.danielviveiros.spotifystreamer.track;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -52,6 +53,11 @@ public class TopTracksFragment extends Fragment
     private TopTracksAdapter mTopTracksAdapter;
     private ListView mTopTracksListView;
 
+    /**
+     * Progress dialog
+     */
+    private ProgressDialog mProgressDialog;
+
     public TopTracksFragment() {
         mTrackList = new ArrayList<Track>();
     }
@@ -68,6 +74,8 @@ public class TopTracksFragment extends Fragment
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.toptracks_fragment, container, false);
+
+        mProgressDialog = ProgressDialog.show(getActivity(), "Please wait ...", "Fetching tracks ...", true);
 
         Intent intent = getActivity().getIntent();
         mSelectedArtistId = intent.getStringExtra(Constants.ARTIST_ID_KEY);
@@ -160,6 +168,9 @@ public class TopTracksFragment extends Fragment
 
     void restartLoader() {
         getLoaderManager().restartLoader(TRACKS_LOADER, null, this);
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+        }
     }
 
     String getArtistId() {
