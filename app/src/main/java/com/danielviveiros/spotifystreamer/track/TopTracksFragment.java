@@ -1,9 +1,11 @@
 package com.danielviveiros.spotifystreamer.track;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -41,6 +43,7 @@ public class TopTracksFragment extends Fragment
     /** Selected artist */
     private String mSelectedArtistId;
     private String mSelectedArtistName;
+    private Bundle mSavedInstanceState;
 
     /** Top tracks list */
     private List<Track> mTrackList;
@@ -57,6 +60,7 @@ public class TopTracksFragment extends Fragment
     public void onActivityCreated(Bundle savedInstanceState) {
         getLoaderManager().initLoader(TRACKS_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
+
     }
 
     @Override
@@ -68,6 +72,21 @@ public class TopTracksFragment extends Fragment
         Intent intent = getActivity().getIntent();
         mSelectedArtistId = intent.getStringExtra(Constants.ARTIST_ID_KEY);
         mSelectedArtistName = intent.getStringExtra(Constants.ARTIST_NAME_KEY);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
+                getActivity().getBaseContext());
+        SharedPreferences.Editor editor = prefs.edit();
+        if (mSelectedArtistId != null) {
+            Log.v( LOG_TAG, "Adding " + mSelectedArtistId + " as artist Id to prefs");
+            editor.putString("mSelectedArtistId", mSelectedArtistId);
+        }
+        if (mSelectedArtistName != null) {
+            Log.v(LOG_TAG, "Adding " + mSelectedArtistName + " as artist name to prefs");
+            editor.putString("mSelectedArtistName", mSelectedArtistName);
+        }
+        editor.commit();
+
+
         Log.v(LOG_TAG, "StreamerArtist id = " + mSelectedArtistId +
                 ", artist name = " + mSelectedArtistName);
 
@@ -114,17 +133,17 @@ public class TopTracksFragment extends Fragment
      * Updates the list of top tracks
      */
     private void updateTopTracks() {
-        FetchTracksTask tracksTask = new FetchTracksTask(this, mSelectedArtistName);
-        tracksTask.execute(mSelectedArtistId);
+        FetchTracksTask tracksTask = new FetchTracksTask(this, getArtistName());
+        tracksTask.execute(getArtistId());
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         String selection = SpotifyStreamerContract.TrackEntry.COLUMN_ARTIST_KEY + " = ?";
-        String[] selectionArgs = new String[]{mSelectedArtistId};
+        String[] selectionArgs = new String[]{getArtistId()};
         String sortOrder = null;
-        Uri uri = SpotifyStreamerContract.TrackEntry.buildTrackByArtistUri(mSelectedArtistId);
+        Uri uri = SpotifyStreamerContract.TrackEntry.buildTrackByArtistUri(getArtistId());
         return new CursorLoader(getActivity(), uri,
                 TrackRepository.FULL_PROJECTION, selection, selectionArgs, sortOrder);
     }
@@ -141,5 +160,25 @@ public class TopTracksFragment extends Fragment
 
     void restartLoader() {
         getLoaderManager().restartLoader(TRACKS_LOADER, null, this);
+    }
+
+    String getArtistId() {
+        if (mSelectedArtistId == null) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
+                    getActivity().getBaseContext());
+            mSelectedArtistId = prefs.getString( "mSelectedArtistId", null );
+            Log.v( LOG_TAG, "mSelectedArtistId == null, getting from prefs... New value = " + mSelectedArtistId );
+        }
+        return mSelectedArtistId;
+    }
+
+    String getArtistName() {
+        if (mSelectedArtistName == null)  {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
+                    getActivity().getBaseContext());
+            mSelectedArtistName = prefs.getString( "mSelectedArtistName", null );
+            Log.v( LOG_TAG, "mSelectedArtistName == null, getting from prefs... New value = " + mSelectedArtistName );
+        }
+        return mSelectedArtistName;
     }
 }

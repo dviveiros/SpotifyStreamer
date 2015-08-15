@@ -73,6 +73,10 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
         String artistId;
         if (params.length == 1) {
             artistId = params[0];
+            if (artistId == null) {
+                Log.w(LOG_TAG, "Artist ID = null, this should not happen. Returning...");
+                return null;
+            }
         } else {
             String message = "StreamerArtist ID expected. Found length = " + params.length;
             Log.e(LOG_TAG, message);
