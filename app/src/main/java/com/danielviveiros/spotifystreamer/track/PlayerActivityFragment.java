@@ -1,35 +1,31 @@
 package com.danielviveiros.spotifystreamer.track;
 
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.danielviveiros.spotifystreamer.R;
+import com.danielviveiros.spotifystreamer.media.MediaCallback;
+import com.danielviveiros.spotifystreamer.media.StreamerMediaPlayer;
 import com.danielviveiros.spotifystreamer.util.Constants;
 import com.squareup.picasso.Picasso;
-
-import java.io.IOException;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PlayerActivityFragment extends Fragment {
+public class PlayerActivityFragment extends Fragment
+        implements MediaCallback {
 
     private static final String LOG_TAG = PlayerActivityFragment.class.getSimpleName();
-
-    private static final int PLAYER_LOADER = 2;
 
     private String mArtistName;
     private String mTrackName;
@@ -42,7 +38,10 @@ public class PlayerActivityFragment extends Fragment {
     private ImageButton mPreviousButton;
     private ImageButton mNextButton;
 
-    private MediaPlayer mMediaPlayer;
+    /** Seek bar */
+    private SeekBar mSeekBar;
+
+    private StreamerMediaPlayer mMediaPlayer = StreamerMediaPlayer.getInstance();
     private boolean mIsPlaying = false;
 
     public PlayerActivityFragment() {
@@ -76,76 +75,84 @@ public class PlayerActivityFragment extends Fragment {
         trackTextView.setText(mTrackName);
         Picasso.with(getActivity()).load(mAlbumImageUrl).into(imageView);
 
+        //seekbar
+        mSeekBar = (SeekBar) view.findViewById( R.id.seekbar_player );
+
         //buttons
         mPlayButton = (ImageButton) view.findViewById( R.id.play_button);
         mPreviousButton = (ImageButton) view.findViewById( R.id.previous_button);
         mNextButton = (ImageButton) view.findViewById( R.id.next_button);
 
+
         mPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mIsPlaying) {
-                    stopMusic();
+                if (mMediaPlayer.isPlaying()) {
+                    pauseMusic();
                 } else {
                     playMusic();
                 }
             }
         });
 
+
+        mMediaPlayer.addListener( "PlayerActivityFragment", this );
+        mMediaPlayer.loadMusic( mPreviewUrl, getActivity() );
+        if (mMediaPlayer.isPlaying()) {
+            mPlayButton.setImageResource(R.drawable.ic_pause_black_24dp);
+        }
+
         return view;
     }
 
     @Override
-    public void onPause() {
-        if (mIsPlaying) {
-            stopMusic();
-        }
-        super.onPause();
+    public void onMediaStart() {
+        mPlayButton.setImageResource(R.drawable.ic_pause_black_24dp);
+    }
+
+    @Override
+    public void onMediaPause() {
+        mPlayButton.setImageResource( R.drawable.ic_play_arrow_black_24dp );
+    }
+
+    @Override
+    public void onMediaStop() {
+        mPlayButton.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+    }
+
+    @Override
+    public void onMediaManagerPrepared() {
+        playMusic();
     }
 
     /**
      * Play the music
      */
     private void playMusic() {
-        if (TextUtils.isEmpty( mPreviewUrl )) {
+        try {
+            mMediaPlayer.play();
+        } catch ( Exception exc ) {
+            Log.e(LOG_TAG, "Error playing music: " + mPreviewUrl, exc);
             Toast toast = Toast.makeText(getActivity().getBaseContext(),
-                    this.getResources().getText(R.string.music_not_playable),
+                    this.getResources().getText(R.string.error_playing_music),
                     Toast.LENGTH_LONG);
             toast.show();
             return;
         }
+    }
 
-        try {
-            if (mMediaPlayer == null) {
-                mMediaPlayer = new MediaPlayer();
-                Uri musicUri = Uri.parse(mPreviewUrl);
-                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC );
-                mMediaPlayer.setDataSource(getActivity(), musicUri);
-                mMediaPlayer.prepare();
-            }
-
-            mMediaPlayer.start();
-            mIsPlaying = true;
-            mPlayButton.setImageResource( R.drawable.ic_pause_black_24dp );
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error playing music: " + mPreviewUrl, e);
-        }
+    /**
+     * Pause the music
+     */
+    private void pauseMusic() {
+        mMediaPlayer.pause();
     }
 
     /**
      * Stop the music
      */
     private void stopMusic() {
-        if (mMediaPlayer == null) {
-            return;
-        }
-
-        if (mMediaPlayer.isPlaying()) {
-            mMediaPlayer.pause();
-            mIsPlaying = false;
-            mPlayButton.setImageResource( R.drawable.ic_play_arrow_black_24dp );
-        }
+        mMediaPlayer.stop();
     }
-
 
 }

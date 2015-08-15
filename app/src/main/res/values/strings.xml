@@ -15,8 +15,8 @@
 
     <!-- Player -->
     <string name="title_activity_player">Player</string>
-    <string name="music_not_playable">This music is not playable...</string>
-
+    <string name="music_not_playable">This music is not playable</string>
+    <string name="error_playing_music">Error playing music</string>
 
     <!-- Settings -->
     <string name="action_settings">Settings</string>
