@@ -99,4 +99,16 @@ public class TrackRepository {
 
         return returnCount;
     }
+
+    /**
+     * Remove all data from the database
+     */
+    public void deleteAll() {
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        try {
+            db.delete(SpotifyStreamerContract.TrackEntry.TABLE_NAME, null, null);
+        } finally {
+            db.close();
+        }
+    }
 }

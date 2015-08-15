@@ -1,6 +1,5 @@
 package com.danielviveiros.spotifystreamer.track;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -17,7 +16,6 @@ import android.widget.Toast;
 import com.danielviveiros.spotifystreamer.R;
 import com.danielviveiros.spotifystreamer.media.MediaCallback;
 import com.danielviveiros.spotifystreamer.media.StreamerMediaPlayer;
-import com.danielviveiros.spotifystreamer.util.Constants;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
@@ -37,6 +35,12 @@ public class PlayerActivityFragment extends Fragment
     private String mAlbumName;
     private String mAlbumImageUrl;
     private String mPreviewUrl;
+
+    /** UI components */
+    private TextView mArtistTextView;
+    private TextView mAlbumTextView;
+    private TextView mTrackTextView;
+    private ImageView mImageView;
 
     /** Buttons */
     private ImageButton mPlayButton;
@@ -65,35 +69,25 @@ public class PlayerActivityFragment extends Fragment
 
         View view = inflater.inflate(R.layout.player_fragment, container, false);
 
-        //seekbar
+        //UI components
+        mArtistTextView = (TextView) view.findViewById( R.id.artist_textview );
+        mAlbumTextView = (TextView) view.findViewById(R.id.album_textview);
+        mTrackTextView = (TextView) view.findViewById(R.id.track_textview);
+        mImageView = (ImageView) view.findViewById( R.id.album_artwork );
         mSeekBar = (SeekBar) view.findViewById( R.id.seekbar_player );
-        mSeekBar.setOnSeekBarChangeListener(this);
-        mTotalLengthTextView = (TextView) view.findViewById( R.id.end_song_textview );
-        setTotalLength();
-
-        Intent intent = getActivity().getIntent();
-        mArtistName = intent.getStringExtra(Constants.ARTIST_NAME_KEY );
-        mTrackName = intent.getStringExtra(Constants.TRACK_NAME_KEY );
-        mAlbumName = intent.getStringExtra(Constants.ALBUM_NAME_KEY );
-        mAlbumImageUrl = intent.getStringExtra(Constants.ALBUM_IMAGE_KEY );
-        mPreviewUrl = intent.getStringExtra(Constants.URL_PREVIEW_KEY );
-
-        TextView artistTextView = (TextView) view.findViewById( R.id.artist_textview );
-        TextView albumTextView = (TextView) view.findViewById(R.id.album_textview);
-        TextView trackTextView = (TextView) view.findViewById(R.id.track_textview);
-        ImageView imageView = (ImageView) view.findViewById( R.id.album_artwork );
-
-        artistTextView.setText( mArtistName );
-        albumTextView.setText( mAlbumName );
-        trackTextView.setText(mTrackName);
-        Picasso.with(getActivity()).load(mAlbumImageUrl).into(imageView);
-
-        //buttons
         mPlayButton = (ImageButton) view.findViewById( R.id.play_button);
         mPreviousButton = (ImageButton) view.findViewById( R.id.previous_button);
         mNextButton = (ImageButton) view.findViewById( R.id.next_button);
 
+        //seekbar
+        mSeekBar.setOnSeekBarChangeListener(this);
+        mTotalLengthTextView = (TextView) view.findViewById( R.id.end_song_textview );
+        setupSeekBar();
 
+        //load data into the UI
+        this.loadTrackOnUI();
+
+        //button controls
         mPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -104,15 +98,25 @@ public class PlayerActivityFragment extends Fragment
                 }
             }
         });
+        mNextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMediaPlayer.next( getActivity() );
+            }
+        });
+        mPreviousButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMediaPlayer.previous(getActivity());
+            }
+        });
 
-
+        //loads the media player
         mMediaPlayer.addListener( "PlayerActivityFragment", this );
-        mMediaPlayer.loadMusic(mPreviewUrl, getActivity());
+        mMediaPlayer.loadMusic(getActivity());
         if (mMediaPlayer.isPlaying()) {
             mPlayButton.setImageResource(R.drawable.ic_pause_black_24dp);
         }
-
-
 
         return view;
     }
@@ -141,18 +145,8 @@ public class PlayerActivityFragment extends Fragment
 
     @Override
     public void onMediaManagerPrepared() {
-        setTotalLength();
-        int durationInSeconds = mMediaPlayer.getDurationInSeconds();
-        mSeekBar.setMax(durationInSeconds);
-        //Make sure you update Seekbar on UI thread
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                int currentPosition = mMediaPlayer.getCurrentPositionInSeconds();
-                mSeekBar.setProgress(currentPosition);
-                mHandler.postDelayed(this, 1000);
-            }
-        });
+        loadTrackOnUI();
+        setupSeekBar();
         playMusic();
     }
 
@@ -169,6 +163,36 @@ public class PlayerActivityFragment extends Fragment
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
+    }
+
+    /**
+     * Setup the UI
+     */
+    private void loadTrackOnUI() {
+        StreamerTrack track = mMediaPlayer.getCurrentTrack();
+
+        mArtistTextView.setText( track.getArtistName() );
+        mAlbumTextView.setText( track.getAlbumName() );
+        mTrackTextView.setText( track.getName() );
+        Picasso.with(getActivity()).load(track.getAlbumFullImageUrl()).into( mImageView );
+    }
+
+    /**
+     * Setup the seek bar
+     */
+    private void setupSeekBar() {
+        setTotalLength();
+        int durationInSeconds = mMediaPlayer.getDurationInSeconds();
+        mSeekBar.setMax(durationInSeconds);
+        //Make sure you update Seekbar on UI thread
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int currentPosition = mMediaPlayer.getCurrentPositionInSeconds();
+                mSeekBar.setProgress(currentPosition);
+                mHandler.postDelayed(this, 1000);
+            }
+        });
     }
 
     /**
@@ -203,7 +227,7 @@ public class PlayerActivityFragment extends Fragment
 
     private void setTotalLength() {
 
-        String strTotalLength = "00:00";
+        String strTotalLength = "--:--";
         int durationInSeconds = mMediaPlayer.getDurationInSeconds();
 
         if (durationInSeconds > 0) {

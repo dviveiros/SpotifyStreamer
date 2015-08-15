@@ -20,12 +20,8 @@ import android.widget.ListView;
 
 import com.danielviveiros.spotifystreamer.R;
 import com.danielviveiros.spotifystreamer.data.SpotifyStreamerContract;
+import com.danielviveiros.spotifystreamer.media.StreamerMediaPlayer;
 import com.danielviveiros.spotifystreamer.util.Constants;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import kaaes.spotify.webapi.android.models.Track;
 
 
 /**
@@ -44,10 +40,9 @@ public class TopTracksFragment extends Fragment
     /** Selected artist */
     private String mSelectedArtistId;
     private String mSelectedArtistName;
-    private Bundle mSavedInstanceState;
 
-    /** Top tracks list */
-    private List<Track> mTrackList;
+    /** Media Player */
+    private StreamerMediaPlayer mMediaPlayer;
 
     /** Adapter and ListView*/
     private TopTracksAdapter mTopTracksAdapter;
@@ -59,7 +54,7 @@ public class TopTracksFragment extends Fragment
     private ProgressDialog mProgressDialog;
 
     public TopTracksFragment() {
-        mTrackList = new ArrayList<Track>();
+        mMediaPlayer = StreamerMediaPlayer.getInstance();
     }
 
     @Override
@@ -105,6 +100,11 @@ public class TopTracksFragment extends Fragment
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
+                mMediaPlayer.setPositionInQueue( i );
+                Intent playerlIntent = new Intent(getActivity(), PlayerActivity.class);
+                startActivity(playerlIntent);
+
+                /*
                 Cursor data = (Cursor) adapterView.getItemAtPosition(i);
                 if (data != null) {
                     String albumName = data.getString(TrackRepository.COL_INDEX_ALBUM_NAME);
@@ -122,6 +122,7 @@ public class TopTracksFragment extends Fragment
 
                     startActivity(playerlIntent);
                 }
+                */
             }
         });
 

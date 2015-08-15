@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.danielviveiros.spotifystreamer.R;
+import com.danielviveiros.spotifystreamer.media.StreamerMediaPlayer;
 import com.danielviveiros.spotifystreamer.util.Utilities;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
     private boolean mNotFound;
     private TrackRepository trackRepository;
     private String mArtistName;
+    private StreamerMediaPlayer mMediaPlayer;
 
     /**
      * Constructor
@@ -44,6 +46,7 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
         mNotFound = false;
         trackRepository = trackRepository.getInstance( topTracksFragment.getActivity() );
         mArtistName = artistName;
+        mMediaPlayer = StreamerMediaPlayer.getInstance();
     }
 
     @Override
@@ -102,6 +105,7 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
         try {
             SpotifyService spotify = api.getService();
             Tracks tracks = spotify.getArtistTopTrack(artistId, mapParams);
+            mMediaPlayer.resetQueue();
             for (Track track : tracks.tracks) {
                 StreamerTrack streamerTrack = new StreamerTrack(
                         artistId,
@@ -114,11 +118,16 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
                         track.preview_url,
                         mArtistName);
                 tracksFound.add(streamerTrack);
+                mMediaPlayer.addTrackToQueue( streamerTrack );
+                if (tracksFound.size() == 10) { //we want the top 10 tracks
+                    break;
+                }
             }
 
             // add to database
             int inserted = 0;
             if ( tracksFound.size() > 0 ) {
+                trackRepository.deleteAll();
                 inserted = trackRepository.bulkInsert(tracksFound);
             }
 

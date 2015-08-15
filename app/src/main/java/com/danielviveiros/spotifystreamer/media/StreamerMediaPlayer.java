@@ -9,9 +9,13 @@ import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.danielviveiros.spotifystreamer.track.StreamerTrack;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,6 +43,8 @@ public class StreamerMediaPlayer {
     private String mMusicUri;
     private Map<String,MediaCallback> mMediaListeners;
     private Boolean mIsLoaded;
+    private List<StreamerTrack> mTrackQueue;
+    private int positionInQueue;
 
     /**
      * Constructor
@@ -47,6 +53,8 @@ public class StreamerMediaPlayer {
         mMediaPlayer = new MediaPlayer();
         mMediaListeners = new HashMap<String,MediaCallback>();
         mIsLoaded = false;
+        mTrackQueue = new ArrayList<>();
+        positionInQueue = -1;
     }
 
     /**
@@ -69,7 +77,12 @@ public class StreamerMediaPlayer {
     /**
      * Load a music by its URL
      */
-    public void loadMusic( String strMusicUri, Context context ) {
+    public void loadMusic( Context context ) {
+
+        if ((positionInQueue < 0) || (getCurrentTrack() == null)) {
+            return;
+        }
+        String strMusicUri = getCurrentTrack().getUrlPreview();
 
         if ((mMusicUri != null) && strMusicUri.equals(mMusicUri)) {
             // loading the same music that is loaded right now,
@@ -156,12 +169,48 @@ public class StreamerMediaPlayer {
 
         if (mMediaPlayer.isPlaying()) {
             mMediaPlayer.stop();
-            mMediaPlayer.release();
-            mMediaPlayer = null;
+
+        }
+
+        mMediaPlayer.release();
+        mMediaPlayer = null;
+        if (mWifiLock != null) {
             mWifiLock.release();
         }
 
         this.notifyAll( StreamerMediaPlayer.EVENT_STOP );
+    }
+
+    /**
+     * Moves to the next music
+     */
+    public void next( Context context ) {
+        positionInQueue++;
+        if (positionInQueue > (mTrackQueue.size()-1)) {
+            positionInQueue = 0;
+        }
+
+        if (mMediaPlayer != null) {
+            stop();
+        }
+
+        loadMusic(context);
+    }
+
+    /**
+     * Moves to the next music
+     */
+    public void previous( Context context ) {
+        positionInQueue--;
+        if (positionInQueue < 0) {
+            positionInQueue = mTrackQueue.size() - 1;
+        }
+
+        if (mMediaPlayer != null) {
+            stop();
+        }
+
+        loadMusic( context );
     }
 
     /**
@@ -203,6 +252,36 @@ public class StreamerMediaPlayer {
         if (mMediaPlayer != null) {
             mMediaPlayer.seekTo( position * 1000 );
         }
+    }
+
+    /**
+     * Resets the queue
+     */
+    public void resetQueue() {
+        positionInQueue = -1;
+        mTrackQueue.clear();
+    }
+
+    /**
+     * Adds a track to this queue
+     */
+    public void addTrackToQueue( StreamerTrack track ) {
+        mTrackQueue.add(track);
+    }
+
+    public int getPositionInQueue() {
+        return positionInQueue;
+    }
+
+    public void setPositionInQueue(int positionInQueue) {
+        this.positionInQueue = positionInQueue;
+    }
+
+    public StreamerTrack getCurrentTrack() {
+        if (positionInQueue == -1) {
+            return null;
+        }
+        return mTrackQueue.get( positionInQueue );
     }
 
     /**
