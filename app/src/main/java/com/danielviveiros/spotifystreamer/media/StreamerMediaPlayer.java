@@ -28,6 +28,7 @@ public class StreamerMediaPlayer {
     private static final int EVENT_PAUSE = 1;
     private static final int EVENT_STOP = 2;
     private static final int EVENT_PREPARED = 3;
+    private static final int EVENT_COMPLETION = 4;
 
     /** Singleton instance */
     private static StreamerMediaPlayer mInstance;
@@ -37,6 +38,7 @@ public class StreamerMediaPlayer {
     private WifiManager.WifiLock mWifiLock;
     private String mMusicUri;
     private Map<String,MediaCallback> mMediaListeners;
+    private Boolean mIsLoaded;
 
     /**
      * Constructor
@@ -44,6 +46,7 @@ public class StreamerMediaPlayer {
     private StreamerMediaPlayer() {
         mMediaPlayer = new MediaPlayer();
         mMediaListeners = new HashMap<String,MediaCallback>();
+        mIsLoaded = false;
     }
 
     /**
@@ -87,8 +90,17 @@ public class StreamerMediaPlayer {
                 mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
+                        mIsLoaded = true;
                         StreamerMediaPlayer streamerMediaPlayer = StreamerMediaPlayer.getInstance();
-                        streamerMediaPlayer.notifyAll( StreamerMediaPlayer.EVENT_PREPARED );
+                        streamerMediaPlayer.notifyAll(StreamerMediaPlayer.EVENT_PREPARED);
+                    }
+                });
+
+                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        StreamerMediaPlayer streamerMediaPlayer = StreamerMediaPlayer.getInstance();
+                        streamerMediaPlayer.notifyAll(StreamerMediaPlayer.EVENT_COMPLETION);
                     }
                 });
 
@@ -163,6 +175,37 @@ public class StreamerMediaPlayer {
     }
 
     /**
+     * Duration
+     */
+    public int getDurationInSeconds() {
+        if ((mMediaPlayer == null) || (!mIsLoaded)) {
+            return 0;
+        } else {
+            return mMediaPlayer.getDuration() / 1000;
+        }
+    }
+
+    /**
+     * Current position
+     */
+    public int getCurrentPositionInSeconds() {
+        if (mMediaPlayer == null) {
+            return 0;
+        } else {
+            return mMediaPlayer.getCurrentPosition() / 1000;
+        }
+    }
+
+    /**
+     * Go to a specific position
+     */
+    public void goToPosition( int position ) {
+        if (mMediaPlayer != null) {
+            mMediaPlayer.seekTo( position * 1000 );
+        }
+    }
+
+    /**
      * Notify the observers
      */
     void notifyAll( int event ) {
@@ -188,6 +231,10 @@ public class StreamerMediaPlayer {
                 }
                 case StreamerMediaPlayer.EVENT_PREPARED: {
                     listener.onMediaManagerPrepared();
+                    break;
+                }
+                case StreamerMediaPlayer.EVENT_COMPLETION: {
+                    listener.onMediaCompletion();
                     break;
                 }
                 default: {

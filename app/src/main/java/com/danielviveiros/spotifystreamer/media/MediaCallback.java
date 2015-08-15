@@ -18,6 +18,11 @@ public interface MediaCallback {
     public void onMediaPause();
 
     /**
+     * Music has completed
+     */
+    public void onMediaCompletion();
+
+    /**
      * Media manager has stopped
      */
     public void onMediaStop();
