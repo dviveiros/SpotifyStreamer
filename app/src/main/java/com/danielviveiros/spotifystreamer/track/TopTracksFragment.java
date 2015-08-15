@@ -167,6 +167,12 @@ public class TopTracksFragment extends Fragment
 
     void restartLoader() {
         getLoaderManager().restartLoader(TRACKS_LOADER, null, this);
+    }
+
+    /**
+     * Hide progress dialog
+     */
+    void hideProgressDialog() {
         if (mProgressDialog != null) {
             mProgressDialog.dismiss();
         }
@@ -177,7 +183,6 @@ public class TopTracksFragment extends Fragment
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
                     getActivity().getBaseContext());
             mSelectedArtistId = prefs.getString( "mSelectedArtistId", null );
-            Log.v( LOG_TAG, "mSelectedArtistId == null, getting from prefs... New value = " + mSelectedArtistId );
         }
         return mSelectedArtistId;
     }
@@ -187,7 +192,6 @@ public class TopTracksFragment extends Fragment
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
                     getActivity().getBaseContext());
             mSelectedArtistName = prefs.getString( "mSelectedArtistName", null );
-            Log.v( LOG_TAG, "mSelectedArtistName == null, getting from prefs... New value = " + mSelectedArtistName );
         }
         return mSelectedArtistName;
     }

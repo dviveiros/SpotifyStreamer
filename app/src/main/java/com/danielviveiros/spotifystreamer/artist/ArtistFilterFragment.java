@@ -198,6 +198,12 @@ public class ArtistFilterFragment extends Fragment
      */
     void restartLoader() {
         this.getLoaderManager().restartLoader(ArtistFilterFragment.ARTIST_LOADER, null, this);
+    }
+
+    /**
+     * Hide progress dialog
+     */
+    void hideProgressDialog() {
         if (mProgressDialog != null) {
             mProgressDialog.dismiss();
         }

@@ -13,6 +13,11 @@
     <string name="top_tracks_not_found">No tracks found for this artist</string>
     <string name="top_tracks_filter_error">Error fetching tracks. Internet OK?</string>
 
+    <!-- Player -->
+    <string name="title_activity_player">Player</string>
+    <string name="music_not_playable">This music is not playable...</string>
+
+
     <!-- Settings -->
     <string name="action_settings">Settings</string>
     <string name="action_logout">Logout</string>
@@ -20,7 +25,6 @@
     <string name="pref_country_key" translatable="false">pref_country</string>
     <string name="pref_country_title">Your Country</string>
     <string name="pref_country_default" translatable="false">BR</string>
-    <string name="title_activity_player">Spotify Streamer</string>
-    <string name="hello_world">Hello world!</string>
+
 
 </resources>

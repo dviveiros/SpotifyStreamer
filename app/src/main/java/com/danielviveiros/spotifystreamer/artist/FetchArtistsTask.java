@@ -43,6 +43,9 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
 
     @Override
     protected void onPostExecute( Void v ) {
+        super.onPostExecute(v);
+
+        mArtistFilterFragment.hideProgressDialog();
         if (mErrorState) {
             Toast toast = Toast.makeText(mArtistFilterFragment.getActivity().getBaseContext(),
                     mArtistFilterFragment.getResources().getText(R.string.artist_filter_error),

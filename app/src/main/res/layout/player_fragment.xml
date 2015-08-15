@@ -26,11 +26,13 @@
 
         <ImageView
             android:id="@+id/album_artwork"
-            android:layout_width="350dp"
-            android:layout_height="350dp"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
             android:layout_gravity="center_horizontal"
             android:nestedScrollingEnabled="true"
-            android:layout_weight="0.73" />
+            android:layout_weight="0.73"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp" />
 
         <TextView android:id="@+id/track_textview"
             android:layout_width="wrap_content"
@@ -53,6 +55,7 @@
             android:layout_gravity="center_horizontal">
 
             <ImageButton
+                android:id="@+id/previous_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_skip_previous_black_24dp"
@@ -61,6 +64,7 @@
                 android:layout_marginRight="10dp" />
 
             <ImageButton
+                android:id="@+id/play_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_play_arrow_black_24dp"
@@ -69,6 +73,7 @@
                 android:layout_marginRight="10dp" />
 
             <ImageButton
+                android:id="@+id/next_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_skip_next_black_24dp"

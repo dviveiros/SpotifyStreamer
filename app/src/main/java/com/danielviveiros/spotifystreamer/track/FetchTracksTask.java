@@ -50,6 +50,8 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
     protected void onPostExecute(Void v) {
         super.onPostExecute(v);
 
+        mTopTracksFragment.hideProgressDialog();
+
         if (mErrorState) {
             Toast toast = Toast.makeText(mTopTracksFragment.getActivity().getBaseContext(),
                     mTopTracksFragment.getResources().getText(R.string.top_tracks_filter_error),
