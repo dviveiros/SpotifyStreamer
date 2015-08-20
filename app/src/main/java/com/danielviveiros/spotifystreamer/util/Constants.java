@@ -13,10 +13,7 @@ public interface Constants {
     /** Intent parameter keys */
     public static final String ARTIST_ID_KEY = "artistId";
     public static final String ARTIST_NAME_KEY = "artistName";
-    public static final String ALBUM_NAME_KEY = "albumName";
-    public static final String ALBUM_IMAGE_KEY = "albumImage";
-    public static final String TRACK_NAME_KEY = "trackName";
-    public static final String URL_PREVIEW_KEY = "urlPreview";
+    public static final String IS_LARGE_SCREEN_KEY = "isLargeScreen";
 
     /** Default image */
     public static final String DEFAULT_IMAGE = "https://storage.googleapis.com/viveiros_udacity/silhouette.png";

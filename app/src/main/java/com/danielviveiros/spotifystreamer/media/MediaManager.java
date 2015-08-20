@@ -23,9 +23,9 @@ import java.util.Map;
  *
  * Created by dviveiros on 15/08/15.
  */
-public class StreamerMediaPlayer {
+public class MediaManager {
 
-    private static final String LOG_TAG = StreamerMediaPlayer.class.getSimpleName();
+    private static final String LOG_TAG = MediaManager.class.getSimpleName();
 
     /** Events for callbacks */
     private static final int EVENT_PLAY = 0;
@@ -35,9 +35,10 @@ public class StreamerMediaPlayer {
     private static final int EVENT_COMPLETION = 4;
 
     /** Singleton instance */
-    private static StreamerMediaPlayer mInstance;
+    private static MediaManager mInstance;
 
 
+    /** Media player state */
     private MediaPlayer mMediaPlayer;
     private WifiManager.WifiLock mWifiLock;
     private String mMusicUri;
@@ -45,24 +46,29 @@ public class StreamerMediaPlayer {
     private Boolean mIsLoaded;
     private List<StreamerTrack> mTrackQueue;
     private int positionInQueue;
+    private String mArtistId;
+    private String mArtistName;
+    private StreamerTrack mCurrentTrack;
 
     /**
      * Constructor
      */
-    private StreamerMediaPlayer() {
+    private MediaManager() {
         mMediaPlayer = new MediaPlayer();
         mMediaListeners = new HashMap<String,MediaCallback>();
         mIsLoaded = false;
         mTrackQueue = new ArrayList<>();
         positionInQueue = -1;
+        mArtistId = null;
+        mArtistName = null;
     }
 
     /**
      * Returns the singleton instance of this class
      */
-    public static StreamerMediaPlayer getInstance() {
+    public static MediaManager getInstance() {
         if (mInstance == null) {
-            mInstance = new StreamerMediaPlayer();
+            mInstance = new MediaManager();
         }
         return mInstance;
     }
@@ -104,16 +110,16 @@ public class StreamerMediaPlayer {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
                         mIsLoaded = true;
-                        StreamerMediaPlayer streamerMediaPlayer = StreamerMediaPlayer.getInstance();
-                        streamerMediaPlayer.notifyAll(StreamerMediaPlayer.EVENT_PREPARED);
+                        MediaManager mediaManager = MediaManager.getInstance();
+                        mediaManager.notifyAll(MediaManager.EVENT_PREPARED);
                     }
                 });
 
                 mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
-                        StreamerMediaPlayer streamerMediaPlayer = StreamerMediaPlayer.getInstance();
-                        streamerMediaPlayer.notifyAll(StreamerMediaPlayer.EVENT_COMPLETION);
+                        MediaManager mediaManager = MediaManager.getInstance();
+                        mediaManager.notifyAll(MediaManager.EVENT_COMPLETION);
                     }
                 });
 
@@ -142,7 +148,7 @@ public class StreamerMediaPlayer {
             throw new PlayingMusicException( mMusicUri, exc );
         }
 
-        this.notifyAll(StreamerMediaPlayer.EVENT_PLAY);
+        this.notifyAll(MediaManager.EVENT_PLAY);
     }
 
     /**
@@ -155,7 +161,7 @@ public class StreamerMediaPlayer {
 
         if (mMediaPlayer.isPlaying()) {
             mMediaPlayer.pause();
-            this.notifyAll(StreamerMediaPlayer.EVENT_PAUSE);
+            this.notifyAll(MediaManager.EVENT_PAUSE);
         }
     }
 
@@ -178,7 +184,7 @@ public class StreamerMediaPlayer {
             mWifiLock.release();
         }
 
-        this.notifyAll( StreamerMediaPlayer.EVENT_STOP );
+        this.notifyAll( MediaManager.EVENT_STOP );
     }
 
     /**
@@ -258,6 +264,7 @@ public class StreamerMediaPlayer {
      * Resets the queue
      */
     public void resetQueue() {
+        Log.v(LOG_TAG, "Reseting queue...");
         positionInQueue = -1;
         mTrackQueue.clear();
     }
@@ -266,22 +273,33 @@ public class StreamerMediaPlayer {
      * Adds a track to this queue
      */
     public void addTrackToQueue( StreamerTrack track ) {
+        Log.v(LOG_TAG, "Adding track: " + track.getName() );
         mTrackQueue.add(track);
-    }
-
-    public int getPositionInQueue() {
-        return positionInQueue;
     }
 
     public void setPositionInQueue(int positionInQueue) {
         this.positionInQueue = positionInQueue;
+        this.mCurrentTrack = mTrackQueue.get(positionInQueue);
     }
 
     public StreamerTrack getCurrentTrack() {
-        if (positionInQueue == -1) {
-            return null;
-        }
-        return mTrackQueue.get( positionInQueue );
+        return mCurrentTrack;
+    }
+
+    public String getArtistId() {
+        return mArtistId;
+    }
+
+    public void setArtistId(String mArtistId) {
+        this.mArtistId = mArtistId;
+    }
+
+    public String getArtistName() {
+        return mArtistName;
+    }
+
+    public void setArtistName(String mArtistName) {
+        this.mArtistName = mArtistName;
     }
 
     /**
@@ -296,23 +314,23 @@ public class StreamerMediaPlayer {
             key = keys.next();
             listener = mMediaListeners.get(key);
             switch (event) {
-                case StreamerMediaPlayer.EVENT_PLAY: {
+                case MediaManager.EVENT_PLAY: {
                     listener.onMediaStart();
                     break;
                 }
-                case StreamerMediaPlayer.EVENT_PAUSE: {
+                case MediaManager.EVENT_PAUSE: {
                     listener.onMediaPause();
                     break;
                 }
-                case StreamerMediaPlayer.EVENT_STOP: {
+                case MediaManager.EVENT_STOP: {
                     listener.onMediaStop();
                     break;
                 }
-                case StreamerMediaPlayer.EVENT_PREPARED: {
+                case MediaManager.EVENT_PREPARED: {
                     listener.onMediaManagerPrepared();
                     break;
                 }
-                case StreamerMediaPlayer.EVENT_COMPLETION: {
+                case MediaManager.EVENT_COMPLETION: {
                     listener.onMediaCompletion();
                     break;
                 }

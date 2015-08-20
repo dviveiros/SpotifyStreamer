@@ -1,12 +1,14 @@
 package com.danielviveiros.spotifystreamer.track;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -15,7 +17,7 @@ import android.widget.Toast;
 
 import com.danielviveiros.spotifystreamer.R;
 import com.danielviveiros.spotifystreamer.media.MediaCallback;
-import com.danielviveiros.spotifystreamer.media.StreamerMediaPlayer;
+import com.danielviveiros.spotifystreamer.media.MediaManager;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
@@ -23,7 +25,7 @@ import java.text.DecimalFormat;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PlayerActivityFragment extends Fragment
+public class PlayerActivityFragment extends DialogFragment
         implements MediaCallback, SeekBar.OnSeekBarChangeListener {
 
     private static final String LOG_TAG = PlayerActivityFragment.class.getSimpleName();
@@ -52,7 +54,7 @@ public class PlayerActivityFragment extends Fragment
     private TextView mTotalLengthTextView;
     private Handler mHandler = new Handler();
 
-    private StreamerMediaPlayer mMediaPlayer = StreamerMediaPlayer.getInstance();
+    private MediaManager mMediaPlayer = MediaManager.getInstance();
     private boolean mIsPlaying = false;
 
     public PlayerActivityFragment() {
@@ -61,6 +63,13 @@ public class PlayerActivityFragment extends Fragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        return dialog;
     }
 
     @Override
@@ -138,7 +147,7 @@ public class PlayerActivityFragment extends Fragment
 
     @Override
     public void onMediaCompletion() {
-        mPlayButton.setImageResource( R.drawable.ic_play_arrow_black_24dp );
+        mPlayButton.setImageResource(R.drawable.ic_play_arrow_black_24dp);
         mSeekBar.setProgress(0);
         mMediaPlayer.goToPosition(0);
     }
@@ -171,10 +180,12 @@ public class PlayerActivityFragment extends Fragment
     private void loadTrackOnUI() {
         StreamerTrack track = mMediaPlayer.getCurrentTrack();
 
-        mArtistTextView.setText( track.getArtistName() );
-        mAlbumTextView.setText( track.getAlbumName() );
-        mTrackTextView.setText( track.getName() );
-        Picasso.with(getActivity()).load(track.getAlbumFullImageUrl()).into( mImageView );
+        if (track != null) {
+            mArtistTextView.setText(track.getArtistName());
+            mAlbumTextView.setText(track.getAlbumName());
+            mTrackTextView.setText(track.getName());
+            Picasso.with(getActivity()).load(track.getAlbumFullImageUrl()).into(mImageView);
+        }
     }
 
     /**

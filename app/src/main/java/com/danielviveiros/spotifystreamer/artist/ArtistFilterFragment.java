@@ -2,7 +2,6 @@ package com.danielviveiros.spotifystreamer.artist;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -27,14 +26,10 @@ import android.widget.TextView;
 
 import com.danielviveiros.spotifystreamer.R;
 import com.danielviveiros.spotifystreamer.data.SpotifyStreamerContract;
-import com.danielviveiros.spotifystreamer.main.MainActivity;
-import com.danielviveiros.spotifystreamer.track.TopTracksActivity;
-import com.danielviveiros.spotifystreamer.util.Constants;
+import com.danielviveiros.spotifystreamer.media.MediaManager;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import kaaes.spotify.webapi.android.models.Artist;
 
 
 /**
@@ -59,11 +54,6 @@ public class ArtistFilterFragment extends Fragment
     private ArtistAdapter mArtistAdapter;
 
     /**
-     * Reference to MainActivity
-     */
-    private MainActivity mMainActivity;
-
-    /**
      * List view
      */
     private ListView mArtistsListView;
@@ -74,17 +64,31 @@ public class ArtistFilterFragment extends Fragment
     private String mArtistFilter;
 
     /**
-     * List of artists being shown
+     * List of callbacks
      */
-    private List<Artist> mArtistList;
+    private List<Callback> mListCallbacks;
 
     /**
      * Progress dialog
      */
     private ProgressDialog mProgressDialog;
 
+    /**
+     * Media manager
+     */
+    private MediaManager mMediaManager;
+
     public ArtistFilterFragment() {
-        mArtistList = new ArrayList<Artist>();
+        mListCallbacks = new ArrayList<>();
+        mMediaManager = MediaManager.getInstance();
+
+    }
+
+    /**
+     * Register a callback
+     */
+    public void addCallback( Callback callback ) {
+        mListCallbacks.add(callback);
     }
 
     @Override
@@ -100,9 +104,6 @@ public class ArtistFilterFragment extends Fragment
 
         View rootView = inflater.inflate(R.layout.artistfilter_fragment, container, false);
 
-        //gets a reference to the main activity
-        mMainActivity = (MainActivity) this.getActivity();
-
         //creates the adapter and sets into the list view
         mArtistAdapter = new ArtistAdapter(getActivity(), null, 0);
         mArtistsListView = (ListView) rootView.findViewById(R.id.listview_artist);
@@ -117,10 +118,11 @@ public class ArtistFilterFragment extends Fragment
                 if (cursor != null) {
                     String artistKey = cursor.getString(ArtistRepository.COL_INDEX_KEY);
                     String artistName = cursor.getString(ArtistRepository.COL_INDEX_NAME);
-                    Intent detailIntent = new Intent(getActivity(), TopTracksActivity.class)
-                            .putExtra(Constants.ARTIST_ID_KEY, artistKey)
-                            .putExtra(Constants.ARTIST_NAME_KEY, artistName);
-                    startActivity(detailIntent);
+                    mMediaManager.setArtistId( artistKey );
+                    mMediaManager.setArtistName( artistName );
+                    for ( Callback callback: mListCallbacks ) {
+                        callback.onItemSelected( artistKey, artistName );
+                    }
                 }
             }
         });
@@ -135,19 +137,28 @@ public class ArtistFilterFragment extends Fragment
 
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
 
+                    String text = v.getText().toString();
+                    if (TextUtils.isEmpty(text)) {
+                        return false;
+                    }
+
+                    //check if the filter has changed
+                    if ( (getArtistFilter() != null) && (text.equals(getArtistFilter())) ) {
+                        return false;
+                    }
+
                     //shows a "loading" dialog
                     mProgressDialog = ProgressDialog.show(getActivity(), "Please wait ...", "Fetching artists ...", true);
                     getActivity().getCurrentFocus();
-                    mArtistFilter = v.getText().toString();
+
 
                     //saves the value in case the user hits the back button
-                    if (!TextUtils.isEmpty(mArtistFilter)) {
-                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
-                                getActivity().getBaseContext());
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putString("mArtistFilter", mArtistFilter);
-                        editor.commit();
-                    }
+                    mArtistFilter = text;
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
+                            getActivity().getBaseContext());
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("mArtistFilter", mArtistFilter);
+                    editor.commit();
 
                     //updates the list
                     updateArtistList();
@@ -225,6 +236,20 @@ public class ArtistFilterFragment extends Fragment
             mArtistFilter = prefs.getString("mArtistFilter", null);
         }
         return mArtistFilter;
+    }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+
+        /**
+         * When an item has been selected.
+         */
+        public void onItemSelected(String artistKey, String artistName);
+
     }
 
 }

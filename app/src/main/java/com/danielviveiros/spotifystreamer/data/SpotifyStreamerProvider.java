@@ -7,7 +7,6 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.util.Log;
 
 import com.danielviveiros.spotifystreamer.data.SpotifyStreamerContract.ArtistEntry;
 import com.danielviveiros.spotifystreamer.data.SpotifyStreamerContract.TrackEntry;
@@ -19,8 +18,6 @@ import com.danielviveiros.spotifystreamer.data.SpotifyStreamerContract.TrackEntr
  * Created by dviveiros on 10/08/15.
  */
 public class SpotifyStreamerProvider extends ContentProvider {
-
-    private static final String LOG_TAG = SpotifyStreamerProvider.class.getSimpleName();
 
     // The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -238,9 +235,6 @@ public class SpotifyStreamerProvider extends ContentProvider {
 
     private Cursor getArtistByName( Uri uri, String[] projection, String sortOrder) {
         String artistName = ArtistEntry.getArtistNameFromUri(uri);
-        Log.v(LOG_TAG, "StreamerArtist name to be used in the filter = " + artistName);
-
-
 
         Cursor cursor = mDBHelper.getReadableDatabase().query(
                 ArtistEntry.TABLE_NAME,
@@ -251,13 +245,11 @@ public class SpotifyStreamerProvider extends ContentProvider {
                 null,
                 sortOrder);
 
-        Log.v( LOG_TAG, "getArtistByName(): returning " + cursor.getCount() + " artists");
         return cursor;
     }
 
     private Cursor getTrackByArtist( Uri uri, String[] projection, String sortOrder) {
         String artistId = TrackEntry.getArtistIdFromUri(uri);
-        Log.v( LOG_TAG, "StreamerArtist ID to be used in the filter = " + artistId );
 
         return mDBHelper.getReadableDatabase().query(
                 TrackEntry.TABLE_NAME,

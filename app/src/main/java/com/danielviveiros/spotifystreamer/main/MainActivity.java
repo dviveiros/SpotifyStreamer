@@ -7,56 +7,60 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.danielviveiros.spotifystreamer.R;
+import com.danielviveiros.spotifystreamer.artist.ArtistFilterFragment;
+import com.danielviveiros.spotifystreamer.track.TopTracksActivity;
+import com.danielviveiros.spotifystreamer.track.TopTracksFragment;
+import com.danielviveiros.spotifystreamer.util.Constants;
 
 
-public class MainActivity extends AppCompatActivity {
-        //implements PlayerNotificationCallback, ConnectionStateCallback {
+public class MainActivity extends AppCompatActivity
+        implements ArtistFilterFragment.Callback {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final String TOP_TRACKS_FRAGMENT_TAG = "TTTAG";
 
-    // Spotify-related attributes
-    private static final int REQUEST_CODE = 1337;
-    private static final String REDIRECT_URI = "spotify-streamer-login://callback";
-    private static final String CLIENT_ID = "e8adcbe86eb7453994fdd474bf780712";
-    //This version will not authenticate on Spotify, so the access token will be null
-    //Later, I will add Spotify Login to enhance the experience
-    private String mAccessToken = null;
+    //one or two pane?
+    private boolean mTwoPane;
+
+    //Top tracks fragment
+    private TopTracksFragment mTopTracksFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mAccessToken = prefs.getString(Constants.ACCESS_TOKEN_KEY, null);
-        if ( mAccessToken == null ) {
-            loginSpotify();
+        if (findViewById(R.id.top_tracks_container) != null) {
+            //two pane mode
+            mTwoPane = true;
+            if (savedInstanceState == null) {
+                TopTracksFragment mTopTracksFragment = new TopTracksFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.top_tracks_container, mTopTracksFragment, TOP_TRACKS_FRAGMENT_TAG)
+                        .commit();
+            } else {
+                mTwoPane = false;
+            }
         }
-        */
-    }
 
-    /**
-     * Login to Spotify
-     */
-    /*
-    public void loginSpotify() {
-        //Spotify login
-        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
-                AuthenticationResponse.Type.TOKEN,
-                REDIRECT_URI);
-        builder.setScopes(new String[]{"user-read-private", "streaming"});
-        AuthenticationRequest request = builder.build();
-        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
-    }
-    */
+        //register the callback
+        ArtistFilterFragment artistFilterFragment = (ArtistFilterFragment) getSupportFragmentManager().findFragmentById(
+                R.id.fragment_artist_filter);
+        artistFilterFragment.addCallback(this);
 
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // get the artist fragment here?
     }
 
     @Override
@@ -72,93 +76,35 @@ public class MainActivity extends AppCompatActivity {
             startActivity( intent );
             return true;
         }
-        /*
-        else if (id == R.id.action_logout) {
-            AuthenticationClient.logout(getBaseContext());
-        }
-        */
 
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Returns the Spotify access token
-     */
-    public String getSpotifyAccessToken() {
-        return mAccessToken;
-    }
+    @Override
+    public void onItemSelected(String artistKey, String artistName) {
+        if (mTwoPane) { //tablet
+            TopTracksFragment topTracksFragment = new TopTracksFragment();
 
-    /**
-     * Callback with the token provided by spotify
-     */
-    /*
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
+            //arguments
+            Bundle args = new Bundle();
+            args.putString( Constants.ARTIST_ID_KEY, artistKey);
+            args.putString(Constants.ARTIST_NAME_KEY, artistName);
+            args.putBoolean( Constants.IS_LARGE_SCREEN_KEY, mTwoPane);
 
-        // Check if result comes from the correct activity
-        if (requestCode == REQUEST_CODE) {
-            AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
+            topTracksFragment.setArguments(args);
+            //topTracksFragment.onArtistChanged( artistKey, artistName );
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.top_tracks_container, topTracksFragment, TOP_TRACKS_FRAGMENT_TAG)
+                    .commit();
 
-            switch (response.getType()) {
-                // Response was successful and contains auth token
-                case TOKEN:
-                    mAccessToken = response.getAccessToken();
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putString(Constants.ACCESS_TOKEN_KEY, mAccessToken);
-                    break;
-                // Auth flow returned an error
-                case ERROR:
-                    Log.e(LOG_TAG, "Error authenticating in Spotify: " + response.getCode() + ", "
-                            + response.getError());
-                    break;
-
-                // Most likely auth flow was cancelled
-                default:
-                    Log.e(LOG_TAG, "Unexpected behavior authenticating in Spotify: " +
-                            response.getCode() + ", " + response.getState() );
-            }
+            mTopTracksFragment = topTracksFragment;
+        } else { //smartphone
+            Intent detailIntent = new Intent(this, TopTracksActivity.class)
+                    .putExtra(Constants.ARTIST_ID_KEY, artistKey)
+                    .putExtra(Constants.ARTIST_NAME_KEY, artistName)
+                    .putExtra(Constants.IS_LARGE_SCREEN_KEY, mTwoPane);
+            startActivity(detailIntent);
         }
     }
 
-    @Override
-    public void onLoggedIn() {
-        Log.d(LOG_TAG, "User logged in");
-    }
-
-    @Override
-    public void onLoggedOut() {
-        Log.d(LOG_TAG, "User logged out");
-    }
-
-    @Override
-    public void onLoginFailed(Throwable error) {
-        Log.d(LOG_TAG, "Login failed");
-    }
-
-    @Override
-    public void onTemporaryError() {
-        Log.d(LOG_TAG, "Temporary error occurred");
-    }
-
-    @Override
-    public void onConnectionMessage(String message) {
-        Log.d(LOG_TAG, "Received connection message: " + message);
-    }
-
-    @Override
-    public void onPlaybackEvent(EventType eventType, PlayerState playerState) {
-        Log.d(LOG_TAG, "Playback event received: " + eventType.name());
-    }
-
-    @Override
-    public void onPlaybackError(ErrorType errorType, String errorDetails) {
-        Log.d(LOG_TAG, "Playback error received: " + errorType.name());
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-        */
 }

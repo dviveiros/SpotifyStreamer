@@ -7,7 +7,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.danielviveiros.spotifystreamer.R;
-import com.danielviveiros.spotifystreamer.media.StreamerMediaPlayer;
+import com.danielviveiros.spotifystreamer.media.MediaManager;
 import com.danielviveiros.spotifystreamer.util.Utilities;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
     private boolean mNotFound;
     private TrackRepository trackRepository;
     private String mArtistName;
-    private StreamerMediaPlayer mMediaPlayer;
+    private MediaManager mMediaPlayer;
 
     /**
      * Constructor
@@ -46,7 +46,7 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
         mNotFound = false;
         trackRepository = trackRepository.getInstance( topTracksFragment.getActivity() );
         mArtistName = artistName;
-        mMediaPlayer = StreamerMediaPlayer.getInstance();
+        mMediaPlayer = MediaManager.getInstance();
     }
 
     @Override
@@ -87,6 +87,9 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
             Log.e(LOG_TAG, message);
             throw new RuntimeException( message );
         }
+
+        Log.v(LOG_TAG, "Fetching tracks for artist ID = " + artistId + " and artist name = "
+                + mArtistName );
 
         //gets the country
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(

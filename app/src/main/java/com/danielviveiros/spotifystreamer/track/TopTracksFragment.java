@@ -2,12 +2,11 @@ package com.danielviveiros.spotifystreamer.track;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -20,7 +19,7 @@ import android.widget.ListView;
 
 import com.danielviveiros.spotifystreamer.R;
 import com.danielviveiros.spotifystreamer.data.SpotifyStreamerContract;
-import com.danielviveiros.spotifystreamer.media.StreamerMediaPlayer;
+import com.danielviveiros.spotifystreamer.media.MediaManager;
 import com.danielviveiros.spotifystreamer.util.Constants;
 
 
@@ -42,11 +41,14 @@ public class TopTracksFragment extends Fragment
     private String mSelectedArtistName;
 
     /** Media Player */
-    private StreamerMediaPlayer mMediaPlayer;
+    private MediaManager mMediaManager;
 
     /** Adapter and ListView*/
     private TopTracksAdapter mTopTracksAdapter;
     private ListView mTopTracksListView;
+
+    /** Large Screen? */
+    private boolean mIsLargeScreen;
 
     /**
      * Progress dialog
@@ -54,7 +56,8 @@ public class TopTracksFragment extends Fragment
     private ProgressDialog mProgressDialog;
 
     public TopTracksFragment() {
-        mMediaPlayer = StreamerMediaPlayer.getInstance();
+        mMediaManager = MediaManager.getInstance();
+        mIsLargeScreen = false;
     }
 
     @Override
@@ -70,24 +73,9 @@ public class TopTracksFragment extends Fragment
 
         View rootView = inflater.inflate(R.layout.toptracks_fragment, container, false);
 
-        Intent intent = getActivity().getIntent();
-        mSelectedArtistId = intent.getStringExtra(Constants.ARTIST_ID_KEY);
-        mSelectedArtistName = intent.getStringExtra(Constants.ARTIST_NAME_KEY);
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
-                getActivity().getBaseContext());
-        SharedPreferences.Editor editor = prefs.edit();
-        if (mSelectedArtistId != null) {
-            Log.v( LOG_TAG, "Adding " + mSelectedArtistId + " as artist Id to prefs");
-            editor.putString("mSelectedArtistId", mSelectedArtistId);
-        }
-        if (mSelectedArtistName != null) {
-            Log.v(LOG_TAG, "Adding " + mSelectedArtistName + " as artist name to prefs");
-            editor.putString("mSelectedArtistName", mSelectedArtistName);
-        }
-        editor.commit();
-
-
+        mSelectedArtistId = getArtistId();
+        mSelectedArtistName = getArtistName();
+        mIsLargeScreen = getIsLargeScreen();
         Log.v(LOG_TAG, "StreamerArtist id = " + mSelectedArtistId +
                 ", artist name = " + mSelectedArtistName);
 
@@ -99,34 +87,11 @@ public class TopTracksFragment extends Fragment
         mTopTracksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                mMediaPlayer.setPositionInQueue( i );
-                Intent playerlIntent = new Intent(getActivity(), PlayerActivity.class);
-                startActivity(playerlIntent);
-
-                /*
-                Cursor data = (Cursor) adapterView.getItemAtPosition(i);
-                if (data != null) {
-                    String albumName = data.getString(TrackRepository.COL_INDEX_ALBUM_NAME);
-                    String albumImageUrl = data.getString(TrackRepository.COL_INDEX_FULL_ALBUM_IMAGE_URL);
-                    String trackName = data.getString(TrackRepository.COL_INDEX_NAME);
-                    String urlPreview = data.getString(TrackRepository.COL_INDEX_URL_PREVIEW);
-                    String artistName = data.getString(TrackRepository.COL_INDEX_ARTIST_NAME);
-
-                    Intent playerlIntent = new Intent(getActivity(), PlayerActivity.class);
-                    playerlIntent.putExtra(Constants.ARTIST_NAME_KEY, artistName);
-                    playerlIntent.putExtra(Constants.ALBUM_NAME_KEY, albumName);
-                    playerlIntent.putExtra(Constants.ALBUM_IMAGE_KEY, albumImageUrl);
-                    playerlIntent.putExtra(Constants.TRACK_NAME_KEY, trackName);
-                    playerlIntent.putExtra(Constants.URL_PREVIEW_KEY, urlPreview);
-
-                    startActivity(playerlIntent);
-                }
-                */
+                mMediaManager.setPositionInQueue(i);
+                showPlayer();
             }
         });
 
-        //this.updateTopTracks();
         return rootView;
     }
 
@@ -136,17 +101,46 @@ public class TopTracksFragment extends Fragment
         updateTopTracks();
     }
 
+    public void showPlayer() {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        PlayerActivityFragment newFragment = new PlayerActivityFragment();
+
+        if (mIsLargeScreen) {
+            // The device is using a large layout, so show the player as a dialog
+            newFragment.show(fragmentManager, "dialog");
+        } else {
+
+            /*// The device is smaller, so show the fragment fullscreen
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            // For a little polish, specify a transition animation
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            // To make it fullscreen, use the 'content' root view as the container
+            // for the fragment, which is always the root view for the activity
+            transaction.add(R.id.player_scroll_view, newFragment)
+                    .addToBackStack(null).commit();*/
+
+            Intent playerlIntent = new Intent(getActivity(), PlayerActivity.class);
+            startActivity(playerlIntent);
+        }
+    }
+
     /**
      * Updates the list of top tracks
      */
-    private void updateTopTracks() {
-        mProgressDialog = ProgressDialog.show(getActivity(), "Please wait ...", "Fetching tracks ...", true);
-        FetchTracksTask tracksTask = new FetchTracksTask(this, getArtistName());
-        tracksTask.execute(getArtistId());
+    void updateTopTracks() {
+        if (getArtistId() != null) {
+            mProgressDialog = ProgressDialog.show(getActivity(), "Please wait ...", "Fetching tracks ...", true);
+            FetchTracksTask tracksTask = new FetchTracksTask(this, getArtistName());
+            tracksTask.execute(getArtistId());
+        }
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        if (getArtistId() == null) {
+            return null;
+        }
 
         String selection = SpotifyStreamerContract.TrackEntry.COLUMN_ARTIST_KEY + " = ?";
         String[] selectionArgs = new String[]{getArtistId()};
@@ -167,7 +161,9 @@ public class TopTracksFragment extends Fragment
     }
 
     void restartLoader() {
-        getLoaderManager().restartLoader(TRACKS_LOADER, null, this);
+        if (getLoaderManager() != null) {
+            getLoaderManager().restartLoader(TRACKS_LOADER, null, this);
+        }
     }
 
     /**
@@ -180,20 +176,69 @@ public class TopTracksFragment extends Fragment
     }
 
     String getArtistId() {
-        if (mSelectedArtistId == null) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
-                    getActivity().getBaseContext());
-            mSelectedArtistId = prefs.getString( "mSelectedArtistId", null );
+
+        if (mSelectedArtistId != null) {
+            return mSelectedArtistId;
         }
-        return mSelectedArtistId;
+
+        String artistId = null;
+
+        //check the intent
+        Intent intent = getActivity().getIntent();
+        if ( (intent != null) && (intent.getStringExtra(Constants.ARTIST_ID_KEY) != null)) {
+            artistId = intent.getStringExtra(Constants.ARTIST_ID_KEY);
+        } else {
+            //check the bundle
+            Bundle args = getArguments();
+            if ( args != null) {
+                artistId = args.getString(Constants.ARTIST_ID_KEY);
+            } else {
+                artistId = mMediaManager.getArtistId();
+            }
+        }
+
+        return artistId;
     }
 
     String getArtistName() {
-        if (mSelectedArtistName == null)  {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
-                    getActivity().getBaseContext());
-            mSelectedArtistName = prefs.getString( "mSelectedArtistName", null );
+        if (mSelectedArtistName != null) {
+            return mSelectedArtistName;
         }
-        return mSelectedArtistName;
+
+        String artistName = null;
+
+        //check the intent
+        Intent intent = getActivity().getIntent();
+        if ( (intent != null) && (intent.getStringExtra(Constants.ARTIST_NAME_KEY) != null)) {
+            artistName = intent.getStringExtra(Constants.ARTIST_NAME_KEY);
+        } else {
+            //check the bundle
+            Bundle args = getArguments();
+            if (args != null) {
+                artistName = args.getString(Constants.ARTIST_NAME_KEY);
+            } else {
+                artistName = mMediaManager.getArtistName();
+            }
+        }
+
+        return artistName;
+    }
+
+    boolean getIsLargeScreen() {
+        boolean isLargeScreen = false;
+
+        //check the intent
+        Intent intent = getActivity().getIntent();
+        if ( (intent != null) && (intent.getStringExtra(Constants.IS_LARGE_SCREEN_KEY) != null)) {
+            isLargeScreen = intent.getBooleanExtra(Constants.IS_LARGE_SCREEN_KEY, false);
+        } else {
+            //check the bundle
+            Bundle args = getArguments();
+            if (args != null) {
+                isLargeScreen = args.getBoolean(Constants.IS_LARGE_SCREEN_KEY);
+            }
+        }
+
+        return isLargeScreen;
     }
 }
