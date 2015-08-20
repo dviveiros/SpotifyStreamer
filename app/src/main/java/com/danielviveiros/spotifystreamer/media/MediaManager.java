@@ -44,16 +44,21 @@ public class MediaManager {
     private String mMusicUri;
     private Map<String,MediaCallback> mMediaListeners;
     private Boolean mIsLoaded;
+
+    /** Queue control */
     private List<StreamerTrack> mTrackQueue;
     private int positionInQueue;
     private String mArtistId;
     private String mArtistName;
     private StreamerTrack mCurrentTrack;
+    private String mArtistIdLoaded;
 
     /**
      * Constructor
      */
     private MediaManager() {
+        Log.v( LOG_TAG, "MediaManager constructor::: Creating new instance");
+
         mMediaPlayer = new MediaPlayer();
         mMediaListeners = new HashMap<String,MediaCallback>();
         mIsLoaded = false;
@@ -61,6 +66,7 @@ public class MediaManager {
         positionInQueue = -1;
         mArtistId = null;
         mArtistName = null;
+        mArtistIdLoaded = null;
     }
 
     /**
@@ -88,6 +94,8 @@ public class MediaManager {
         if ((positionInQueue < 0) || (getCurrentTrack() == null)) {
             return;
         }
+
+        Log.v( LOG_TAG, "Loading music... Current track = " + mCurrentTrack );
         String strMusicUri = getCurrentTrack().getUrlPreview();
 
         if ((mMusicUri != null) && strMusicUri.equals(mMusicUri)) {
@@ -191,6 +199,10 @@ public class MediaManager {
      * Moves to the next music
      */
     public void next( Context context ) {
+
+        Log.v( LOG_TAG, "Next triggered. position in queue = " + positionInQueue +
+                "mTrackQueue.size() = " + mTrackQueue.size());
+
         positionInQueue++;
         if (positionInQueue > (mTrackQueue.size()-1)) {
             positionInQueue = 0;
@@ -200,6 +212,7 @@ public class MediaManager {
             stop();
         }
 
+        mCurrentTrack = mTrackQueue.get(positionInQueue);
         loadMusic(context);
     }
 
@@ -216,6 +229,7 @@ public class MediaManager {
             stop();
         }
 
+        mCurrentTrack = mTrackQueue.get(positionInQueue);
         loadMusic( context );
     }
 
@@ -261,20 +275,12 @@ public class MediaManager {
     }
 
     /**
-     * Resets the queue
-     */
-    public void resetQueue() {
-        Log.v(LOG_TAG, "Reseting queue...");
-        positionInQueue = -1;
-        mTrackQueue.clear();
-    }
-
-    /**
      * Adds a track to this queue
      */
-    public void addTrackToQueue( StreamerTrack track ) {
-        Log.v(LOG_TAG, "Adding track: " + track.getName() );
-        mTrackQueue.add(track);
+    public void setTrackList( String artistId, List<StreamerTrack> trackList ) {
+        mArtistIdLoaded = artistId;
+        mTrackQueue = trackList;
+        positionInQueue = -1;
     }
 
     public void setPositionInQueue(int positionInQueue) {
@@ -300,6 +306,10 @@ public class MediaManager {
 
     public void setArtistName(String mArtistName) {
         this.mArtistName = mArtistName;
+    }
+
+    public String getArtistIdLoaded() {
+        return mArtistIdLoaded;
     }
 
     /**

@@ -3,6 +3,7 @@ package com.danielviveiros.spotifystreamer.main;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -38,10 +39,12 @@ public class MainActivity extends AppCompatActivity
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.top_tracks_container, mTopTracksFragment, TOP_TRACKS_FRAGMENT_TAG)
                         .commit();
-            } else {
-                mTwoPane = false;
             }
+        } else {
+            mTwoPane = false;
         }
+
+        Log.v( LOG_TAG, "MainActivity:onCreate --> mTwoPane = " + mTwoPane );
 
         //register the callback
         ArtistFilterFragment artistFilterFragment = (ArtistFilterFragment) getSupportFragmentManager().findFragmentById(
@@ -83,6 +86,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onItemSelected(String artistKey, String artistName) {
         if (mTwoPane) { //tablet
+            Log.v( LOG_TAG, "mTwoPane, triggering tablet mode");
             TopTracksFragment topTracksFragment = new TopTracksFragment();
 
             //arguments
@@ -99,6 +103,7 @@ public class MainActivity extends AppCompatActivity
 
             mTopTracksFragment = topTracksFragment;
         } else { //smartphone
+            Log.v( LOG_TAG, "mTwoPane, triggering smartphone mode");
             Intent detailIntent = new Intent(this, TopTracksActivity.class)
                     .putExtra(Constants.ARTIST_ID_KEY, artistKey)
                     .putExtra(Constants.ARTIST_NAME_KEY, artistName)

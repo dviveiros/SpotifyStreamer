@@ -108,7 +108,6 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
         try {
             SpotifyService spotify = api.getService();
             Tracks tracks = spotify.getArtistTopTrack(artistId, mapParams);
-            mMediaPlayer.resetQueue();
             for (Track track : tracks.tracks) {
                 StreamerTrack streamerTrack = new StreamerTrack(
                         artistId,
@@ -121,7 +120,6 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
                         track.preview_url,
                         mArtistName);
                 tracksFound.add(streamerTrack);
-                mMediaPlayer.addTrackToQueue( streamerTrack );
                 if (tracksFound.size() == 10) { //we want the top 10 tracks
                     break;
                 }
@@ -132,6 +130,13 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
             if ( tracksFound.size() > 0 ) {
                 trackRepository.deleteAll();
                 inserted = trackRepository.bulkInsert(tracksFound);
+            }
+
+            if (inserted == tracksFound.size()) {
+                mMediaPlayer.setTrackList( artistId, tracksFound );
+            } else {
+                Log.e( LOG_TAG, "insert != tracksFound. Something wrong with the database?" );
+                mErrorState = true;
             }
 
             Log.d(LOG_TAG, "FetchTracks Complete. " + inserted + " Inserted");

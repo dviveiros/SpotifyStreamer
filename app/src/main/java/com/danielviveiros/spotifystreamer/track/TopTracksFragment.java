@@ -74,7 +74,18 @@ public class TopTracksFragment extends Fragment
         View rootView = inflater.inflate(R.layout.toptracks_fragment, container, false);
 
         mSelectedArtistId = getArtistId();
+        Log.v( LOG_TAG, "onCreateView, artistsId = " + mSelectedArtistId );
+        if (mSelectedArtistId == null) {
+            mSelectedArtistId = mMediaManager.getArtistId();
+        } else {
+            updateTopTracks();
+        }
         mSelectedArtistName = getArtistName();
+        if (mSelectedArtistName == null) {
+            mSelectedArtistName = mMediaManager.getArtistName();
+        }
+
+
         mIsLargeScreen = getIsLargeScreen();
         Log.v(LOG_TAG, "StreamerArtist id = " + mSelectedArtistId +
                 ", artist name = " + mSelectedArtistName);
@@ -93,12 +104,6 @@ public class TopTracksFragment extends Fragment
         });
 
         return rootView;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        updateTopTracks();
     }
 
     public void showPlayer() {
@@ -128,7 +133,7 @@ public class TopTracksFragment extends Fragment
      * Updates the list of top tracks
      */
     void updateTopTracks() {
-        if (getArtistId() != null) {
+        if ((getArtistId() != null) && (!getArtistId().equals(mMediaManager.getArtistIdLoaded())) ) {
             mProgressDialog = ProgressDialog.show(getActivity(), "Please wait ...", "Fetching tracks ...", true);
             FetchTracksTask tracksTask = new FetchTracksTask(this, getArtistName());
             tracksTask.execute(getArtistId());
@@ -192,8 +197,6 @@ public class TopTracksFragment extends Fragment
             Bundle args = getArguments();
             if ( args != null) {
                 artistId = args.getString(Constants.ARTIST_ID_KEY);
-            } else {
-                artistId = mMediaManager.getArtistId();
             }
         }
 
@@ -216,8 +219,6 @@ public class TopTracksFragment extends Fragment
             Bundle args = getArguments();
             if (args != null) {
                 artistName = args.getString(Constants.ARTIST_NAME_KEY);
-            } else {
-                artistName = mMediaManager.getArtistName();
             }
         }
 
