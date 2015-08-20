@@ -1,5 +1,6 @@
 package com.danielviveiros.spotifystreamer.media;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -37,6 +38,8 @@ public class MediaManager {
     /** Singleton instance */
     private static MediaManager mInstance;
 
+    /** Progress dialog */
+    private ProgressDialog mProgressDialog;
 
     /** Media player state */
     private MediaPlayer mMediaPlayer;
@@ -91,6 +94,8 @@ public class MediaManager {
      */
     public void loadMusic( Context context ) {
 
+        mProgressDialog = ProgressDialog.show(context, "Please wait ...", "Loading music...", true);
+
         if ((positionInQueue < 0) || (getCurrentTrack() == null)) {
             return;
         }
@@ -120,6 +125,10 @@ public class MediaManager {
                         mIsLoaded = true;
                         MediaManager mediaManager = MediaManager.getInstance();
                         mediaManager.notifyAll(MediaManager.EVENT_PREPARED);
+
+                        if (mProgressDialog != null) {
+                            mProgressDialog.dismiss();
+                        }
                     }
                 });
 
@@ -193,6 +202,10 @@ public class MediaManager {
         }
 
         this.notifyAll( MediaManager.EVENT_STOP );
+
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+        }
     }
 
     /**
