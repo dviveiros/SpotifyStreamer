@@ -1,6 +1,7 @@
 package com.danielviveiros.spotifystreamer.track;
 
 import android.app.Dialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
@@ -69,6 +70,7 @@ public class PlayerActivityFragment extends DialogFragment
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable( true );
         return dialog;
     }
 
@@ -83,6 +85,7 @@ public class PlayerActivityFragment extends DialogFragment
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.player_fragment, container, false);
+        view.setBackgroundColor(Color.WHITE);
 
         //UI components
         mArtistTextView = (TextView) view.findViewById( R.id.artist_textview );

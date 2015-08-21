@@ -115,13 +115,13 @@ public class TopTracksFragment extends Fragment
             newFragment.show(fragmentManager, "dialog");
         } else {
 
-            /*// The device is smaller, so show the fragment fullscreen
+           /* // The device is smaller, so show the fragment fullscreen
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             // For a little polish, specify a transition animation
             transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             // To make it fullscreen, use the 'content' root view as the container
             // for the fragment, which is always the root view for the activity
-            transaction.add(R.id.player_scroll_view, newFragment)
+            transaction.add(android.R.id.content, newFragment)
                     .addToBackStack(null).commit();*/
 
             Intent playerlIntent = new Intent(getActivity(), PlayerActivity.class);
@@ -230,7 +230,7 @@ public class TopTracksFragment extends Fragment
 
         //check the intent
         Intent intent = getActivity().getIntent();
-        if ( (intent != null) && (intent.getStringExtra(Constants.IS_LARGE_SCREEN_KEY) != null)) {
+        if ( intent != null ) {
             isLargeScreen = intent.getBooleanExtra(Constants.IS_LARGE_SCREEN_KEY, false);
         } else {
             //check the bundle
