@@ -51,10 +51,6 @@ public class StreamerTrack {
         return albumImageUrl;
     }
 
-    public void setAlbumImageUrl(String albumImageUrl) {
-        this.albumImageUrl = albumImageUrl;
-    }
-
     public Integer getId() {
         return id;
     }
@@ -67,16 +63,8 @@ public class StreamerTrack {
         return artistKey;
     }
 
-    public void setArtistKey(String artistKey) {
-        this.artistKey = artistKey;
-    }
-
     public String getKey() {
         return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 
     public String getName() {
@@ -91,40 +79,20 @@ public class StreamerTrack {
         return albumName;
     }
 
-    public void setAlbumName(String albumName) {
-        this.albumName = albumName;
-    }
-
     public String getAlbumFullImageUrl() {
         return albumFullImageUrl;
-    }
-
-    public void setAlbumFullImageUrl(String albumFullImageUrl) {
-        this.albumFullImageUrl = albumFullImageUrl;
     }
 
     public Long getDuration() {
         return duration;
     }
 
-    public void setDuration(Long duration) {
-        this.duration = duration;
-    }
-
     public String getUrlPreview() {
         return urlPreview;
     }
 
-    public void setUrlPreview(String urlPreview) {
-        this.urlPreview = urlPreview;
-    }
-
     public String getArtistName() {
         return artistName;
-    }
-
-    public void setArtistName(String artistName) {
-        this.artistName = artistName;
     }
 
     @Override

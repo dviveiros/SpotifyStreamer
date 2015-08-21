@@ -88,9 +88,6 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
             throw new RuntimeException( message );
         }
 
-        Log.v(LOG_TAG, "Fetching tracks for artist ID = " + artistId + " and artist name = "
-                + mArtistName );
-
         //gets the country
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
                 mTopTracksFragment.getActivity().getBaseContext());
@@ -139,7 +136,6 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
                 mErrorState = true;
             }
 
-            Log.d(LOG_TAG, "FetchTracks Complete. " + inserted + " Inserted");
         } catch ( Exception exc ) {
             Log.e(LOG_TAG, exc.getMessage(), exc);
             mErrorState = true;

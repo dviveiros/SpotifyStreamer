@@ -43,11 +43,6 @@ public class TopTracksActivity extends AppCompatActivity {
             startActivity( intent );
             return true;
         }
-        /*
-        else if (id == R.id.action_logout) {
-            AuthenticationClient.logout(getBaseContext());
-        }
-        */
 
         return super.onOptionsItemSelected(item);
     }

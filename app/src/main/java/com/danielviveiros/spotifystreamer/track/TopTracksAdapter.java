@@ -18,11 +18,8 @@ import com.squareup.picasso.Picasso;
  */
 public class TopTracksAdapter extends CursorAdapter {
 
-    private Context context;
-
     public TopTracksAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
-        this.context = context;
     }
 
     public class ViewHolder {

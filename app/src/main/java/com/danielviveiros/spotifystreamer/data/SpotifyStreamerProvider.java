@@ -55,6 +55,7 @@ public class SpotifyStreamerProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
+                break;
             }
             case ARTIST_BY_NAME: {
                 retCursor = getArtistByName( uri, projection, sortOrder );
@@ -70,6 +71,7 @@ public class SpotifyStreamerProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
+                break;
             }
             case TRACKS_BY_ARTIST: {
                 retCursor = getTrackByArtist( uri, projection, sortOrder );
@@ -132,7 +134,6 @@ public class SpotifyStreamerProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         final SQLiteDatabase db = mDBHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
-        Uri returnUri;
         int rowsAffected = 0;
 
         if (selection == null) {

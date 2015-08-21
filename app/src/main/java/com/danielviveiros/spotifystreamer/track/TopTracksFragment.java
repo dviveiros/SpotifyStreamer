@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,7 +73,6 @@ public class TopTracksFragment extends Fragment
         View rootView = inflater.inflate(R.layout.toptracks_fragment, container, false);
 
         mSelectedArtistId = getArtistId();
-        Log.v( LOG_TAG, "onCreateView, artistsId = " + mSelectedArtistId );
         if (mSelectedArtistId == null) {
             mSelectedArtistId = mMediaManager.getArtistId();
         } else {
@@ -87,8 +85,6 @@ public class TopTracksFragment extends Fragment
 
 
         mIsLargeScreen = getIsLargeScreen();
-        Log.v(LOG_TAG, "StreamerArtist id = " + mSelectedArtistId +
-                ", artist name = " + mSelectedArtistName);
 
         //prepare the list view and adapter
         mTopTracksAdapter = new TopTracksAdapter(getActivity(), null, 0);
@@ -114,16 +110,6 @@ public class TopTracksFragment extends Fragment
             // The device is using a large layout, so show the player as a dialog
             newFragment.show(fragmentManager, "dialog");
         } else {
-
-           /* // The device is smaller, so show the fragment fullscreen
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            // For a little polish, specify a transition animation
-            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            // To make it fullscreen, use the 'content' root view as the container
-            // for the fragment, which is always the root view for the activity
-            transaction.add(android.R.id.content, newFragment)
-                    .addToBackStack(null).commit();*/
-
             Intent playerlIntent = new Intent(getActivity(), PlayerActivity.class);
             startActivity(playerlIntent);
         }

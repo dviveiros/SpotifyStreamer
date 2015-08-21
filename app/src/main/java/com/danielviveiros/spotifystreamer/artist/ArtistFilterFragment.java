@@ -12,7 +12,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -93,7 +92,6 @@ public class ArtistFilterFragment extends Fragment
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.v(LOG_TAG, ">> onActivityCreated(): Initializing loader");
         getLoaderManager().initLoader(ARTIST_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }

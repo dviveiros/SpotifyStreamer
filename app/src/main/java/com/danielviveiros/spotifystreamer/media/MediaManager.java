@@ -60,8 +60,6 @@ public class MediaManager {
      * Constructor
      */
     private MediaManager() {
-        Log.v( LOG_TAG, "MediaManager constructor::: Creating new instance");
-
         mMediaPlayer = new MediaPlayer();
         mMediaListeners = new HashMap<String,MediaCallback>();
         mIsLoaded = false;
@@ -210,10 +208,6 @@ public class MediaManager {
      * Moves to the next music
      */
     public void next( Context context ) {
-
-        Log.v(LOG_TAG, "Next triggered. position in queue = " + positionInQueue +
-                "mTrackQueue.size() = " + mTrackQueue.size());
-
         positionInQueue++;
         if (positionInQueue > (mTrackQueue.size()-1)) {
             positionInQueue = 0;

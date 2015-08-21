@@ -33,12 +33,6 @@ public class PlayerActivityFragment extends DialogFragment
 
     private static final DecimalFormat mFormat = new DecimalFormat( "##");
 
-    private String mArtistName;
-    private String mTrackName;
-    private String mAlbumName;
-    private String mAlbumImageUrl;
-    private String mPreviewUrl;
-
     /** UI components */
     private TextView mArtistTextView;
     private TextView mAlbumTextView;
@@ -56,7 +50,6 @@ public class PlayerActivityFragment extends DialogFragment
     private Handler mHandler = new Handler();
 
     private MediaManager mMediaManager = MediaManager.getInstance();
-    private boolean mIsPlaying = false;
 
     public PlayerActivityFragment() {
     }
@@ -70,7 +63,6 @@ public class PlayerActivityFragment extends DialogFragment
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        //dialog.setCancelable( true );
         return dialog;
     }
 
@@ -222,7 +214,7 @@ public class PlayerActivityFragment extends DialogFragment
         try {
             mMediaManager.play();
         } catch ( Exception exc ) {
-            Log.e(LOG_TAG, "Error playing music: " + mPreviewUrl, exc);
+            Log.e(LOG_TAG, "Error playing music", exc);
             Toast toast = Toast.makeText(getActivity().getBaseContext(),
                     this.getResources().getText(R.string.error_playing_music),
                     Toast.LENGTH_LONG);
