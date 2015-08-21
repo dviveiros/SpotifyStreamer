@@ -31,7 +31,7 @@ public class PlayerActivityFragment extends DialogFragment
 
     private static final String LOG_TAG = PlayerActivityFragment.class.getSimpleName();
 
-    private static final DecimalFormat mFormat = new DecimalFormat( "## ");
+    private static final DecimalFormat mFormat = new DecimalFormat( "##");
 
     private String mArtistName;
     private String mTrackName;
@@ -70,7 +70,7 @@ public class PlayerActivityFragment extends DialogFragment
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setCancelable( true );
+        //dialog.setCancelable( true );
         return dialog;
     }
 

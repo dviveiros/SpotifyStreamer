@@ -230,7 +230,7 @@ public class TopTracksFragment extends Fragment
 
         //check the intent
         Intent intent = getActivity().getIntent();
-        if ( intent != null ) {
+        if ( (intent != null) && (intent.hasExtra(Constants.IS_LARGE_SCREEN_KEY)) ) {
             isLargeScreen = intent.getBooleanExtra(Constants.IS_LARGE_SCREEN_KEY, false);
         } else {
             //check the bundle
