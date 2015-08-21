@@ -25,6 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:focusable="true"
-        android:descendantFocusability="beforeDescendants"/>
+        android:descendantFocusability="beforeDescendants"
+        style="@style/ArtistFilterStyle"/>
 
 </LinearLayout>

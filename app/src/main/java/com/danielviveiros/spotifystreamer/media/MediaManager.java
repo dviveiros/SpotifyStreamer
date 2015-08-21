@@ -94,7 +94,6 @@ public class MediaManager {
      */
     public void loadMusic( Context context ) {
 
-        mProgressDialog = ProgressDialog.show(context, "Please wait ...", "Loading music...", true);
 
         if ((positionInQueue < 0) || (getCurrentTrack() == null)) {
             return;
@@ -108,6 +107,9 @@ public class MediaManager {
         } else {
 
             try {
+                if ( (mProgressDialog == null) || (!mProgressDialog.isShowing()) ) {
+                    mProgressDialog = ProgressDialog.show(context, "Please wait ...", "Loading music...", true);
+                }
                 stop();
 
                 mMusicUri = strMusicUri;
@@ -126,9 +128,7 @@ public class MediaManager {
                         MediaManager mediaManager = MediaManager.getInstance();
                         mediaManager.notifyAll(MediaManager.EVENT_PREPARED);
 
-                        if (mProgressDialog != null) {
-                            mProgressDialog.dismiss();
-                        }
+                        dismissProgressDialog();
                     }
                 });
 
@@ -203,9 +203,7 @@ public class MediaManager {
 
         this.notifyAll( MediaManager.EVENT_STOP );
 
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-        }
+        dismissProgressDialog();
     }
 
     /**
@@ -213,7 +211,7 @@ public class MediaManager {
      */
     public void next( Context context ) {
 
-        Log.v( LOG_TAG, "Next triggered. position in queue = " + positionInQueue +
+        Log.v(LOG_TAG, "Next triggered. position in queue = " + positionInQueue +
                 "mTrackQueue.size() = " + mTrackQueue.size());
 
         positionInQueue++;
@@ -323,6 +321,12 @@ public class MediaManager {
 
     public String getArtistIdLoaded() {
         return mArtistIdLoaded;
+    }
+
+    public void dismissProgressDialog() {
+        if ((mProgressDialog != null) && (mProgressDialog.isShowing())) {
+            mProgressDialog.dismiss();
+        }
     }
 
     /**

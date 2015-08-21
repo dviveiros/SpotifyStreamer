@@ -54,7 +54,7 @@ public class PlayerActivityFragment extends DialogFragment
     private TextView mTotalLengthTextView;
     private Handler mHandler = new Handler();
 
-    private MediaManager mMediaPlayer = MediaManager.getInstance();
+    private MediaManager mMediaManager = MediaManager.getInstance();
     private boolean mIsPlaying = false;
 
     public PlayerActivityFragment() {
@@ -70,6 +70,12 @@ public class PlayerActivityFragment extends DialogFragment
         Dialog dialog = super.onCreateDialog(savedInstanceState);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         return dialog;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mMediaManager.dismissProgressDialog();
     }
 
     @Override
@@ -100,7 +106,7 @@ public class PlayerActivityFragment extends DialogFragment
         mPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mMediaPlayer.isPlaying()) {
+                if (mMediaManager.isPlaying()) {
                     pauseMusic();
                 } else {
                     playMusic();
@@ -110,20 +116,20 @@ public class PlayerActivityFragment extends DialogFragment
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mMediaPlayer.next( getActivity() );
+                mMediaManager.next(getActivity());
             }
         });
         mPreviousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mMediaPlayer.previous(getActivity());
+                mMediaManager.previous(getActivity());
             }
         });
 
         //loads the media player
-        mMediaPlayer.addListener( "PlayerActivityFragment", this );
-        mMediaPlayer.loadMusic(getActivity());
-        if (mMediaPlayer.isPlaying()) {
+        mMediaManager.addListener("PlayerActivityFragment", this);
+        mMediaManager.loadMusic(getActivity());
+        if (mMediaManager.isPlaying()) {
             mPlayButton.setImageResource(R.drawable.ic_pause_black_24dp);
         }
 
@@ -149,7 +155,7 @@ public class PlayerActivityFragment extends DialogFragment
     public void onMediaCompletion() {
         mPlayButton.setImageResource(R.drawable.ic_play_arrow_black_24dp);
         mSeekBar.setProgress(0);
-        mMediaPlayer.goToPosition(0);
+        mMediaManager.goToPosition(0);
     }
 
     @Override
@@ -162,7 +168,7 @@ public class PlayerActivityFragment extends DialogFragment
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (fromUser) {
-            mMediaPlayer.goToPosition(progress);
+            mMediaManager.goToPosition(progress);
         }
     }
 
@@ -178,7 +184,7 @@ public class PlayerActivityFragment extends DialogFragment
      * Setup the UI
      */
     private void loadTrackOnUI() {
-        StreamerTrack track = mMediaPlayer.getCurrentTrack();
+        StreamerTrack track = mMediaManager.getCurrentTrack();
 
         if (track != null) {
             mArtistTextView.setText(track.getArtistName());
@@ -193,13 +199,13 @@ public class PlayerActivityFragment extends DialogFragment
      */
     private void setupSeekBar() {
         setTotalLength();
-        int durationInSeconds = mMediaPlayer.getDurationInSeconds();
+        int durationInSeconds = mMediaManager.getDurationInSeconds();
         mSeekBar.setMax(durationInSeconds);
         //Make sure you update Seekbar on UI thread
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                int currentPosition = mMediaPlayer.getCurrentPositionInSeconds();
+                int currentPosition = mMediaManager.getCurrentPositionInSeconds();
                 mSeekBar.setProgress(currentPosition);
                 mHandler.postDelayed(this, 1000);
             }
@@ -211,7 +217,7 @@ public class PlayerActivityFragment extends DialogFragment
      */
     private void playMusic() {
         try {
-            mMediaPlayer.play();
+            mMediaManager.play();
         } catch ( Exception exc ) {
             Log.e(LOG_TAG, "Error playing music: " + mPreviewUrl, exc);
             Toast toast = Toast.makeText(getActivity().getBaseContext(),
@@ -226,26 +232,36 @@ public class PlayerActivityFragment extends DialogFragment
      * Pause the music
      */
     private void pauseMusic() {
-        mMediaPlayer.pause();
+        mMediaManager.pause();
     }
 
     /**
      * Stop the music
      */
     private void stopMusic() {
-        mMediaPlayer.stop();
+        mMediaManager.stop();
     }
 
     private void setTotalLength() {
 
         String strTotalLength = "--:--";
-        int durationInSeconds = mMediaPlayer.getDurationInSeconds();
+        int durationInSeconds = mMediaManager.getDurationInSeconds();
 
         if (durationInSeconds > 0) {
             double minutes = Math.floor(durationInSeconds / 60);
             double seconds = Math.floor(durationInSeconds % 60);
 
-            strTotalLength = mFormat.format( minutes ) + ":" + mFormat.format( seconds );
+            String strMinutes = mFormat.format(minutes);
+            if (strMinutes.length() == 1) {
+                strMinutes = "0" + strMinutes;
+            }
+            String strSeconds = mFormat.format( seconds );
+            if (strSeconds.length() == 1) {
+                strSeconds = "0" + strSeconds;
+            }
+
+
+            strTotalLength = strMinutes + ":" + strSeconds;
         }
 
         mTotalLengthTextView.setText( strTotalLength );
