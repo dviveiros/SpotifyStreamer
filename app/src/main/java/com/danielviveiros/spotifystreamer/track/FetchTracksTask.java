@@ -127,6 +127,9 @@ public class FetchTracksTask  extends AsyncTask<String, Void, Void> {
             if ( tracksFound.size() > 0 ) {
                 trackRepository.deleteAll();
                 inserted = trackRepository.bulkInsert(tracksFound);
+            } else {
+                mNotFound = true;
+                return null;
             }
 
             if (inserted == tracksFound.size()) {
