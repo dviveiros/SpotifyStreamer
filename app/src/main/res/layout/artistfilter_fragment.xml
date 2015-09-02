@@ -9,16 +9,20 @@
     android:orientation="vertical"
     tools:context=".MainActivityFragment">
 
-    <EditText
-        android:id="@+id/artist_filter"
+    <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/artist_filter_hint"
-        android:singleLine="true"
-        android:selectAllOnFocus="true"
-        android:imeOptions="actionDone"
-        android:focusableInTouchMode="true"
-        android:inputType="text" />
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/artist_filter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/artist_filter_hint"
+            android:singleLine="true"
+            android:selectAllOnFocus="true"
+            android:imeOptions="actionDone"
+            android:focusableInTouchMode="true"
+            android:inputType="text" />
+    </android.support.design.widget.TextInputLayout>
 
     <ListView
         android:id="@+id/listview_artist"

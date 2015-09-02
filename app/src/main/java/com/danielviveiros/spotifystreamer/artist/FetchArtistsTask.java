@@ -1,8 +1,8 @@
 package com.danielviveiros.spotifystreamer.artist;
 
 import android.os.AsyncTask;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.danielviveiros.spotifystreamer.R;
 import com.danielviveiros.spotifystreamer.util.Utilities;
@@ -47,15 +47,11 @@ public class FetchArtistsTask extends AsyncTask<String, Void, Void> {
 
         mArtistFilterFragment.hideProgressDialog();
         if (mErrorState) {
-            Toast toast = Toast.makeText(mArtistFilterFragment.getActivity().getBaseContext(),
-                    mArtistFilterFragment.getResources().getText(R.string.artist_filter_error),
-                    Toast.LENGTH_LONG);
-            toast.show();
+            Snackbar.make(mArtistFilterFragment.getView(), R.string.artist_filter_error, Snackbar.LENGTH_LONG)
+                    .show();
         } else if (mNotFound) {
-            String msgNotFound = mArtistFilterFragment.getResources().getString(R.string.artist_filter_not_found);
-            Toast noItensToast = Toast.makeText(mArtistFilterFragment.getActivity(),
-                    msgNotFound, Toast.LENGTH_LONG);
-            noItensToast.show();
+            Snackbar.make(mArtistFilterFragment.getView(), R.string.artist_filter_not_found, Snackbar.LENGTH_LONG)
+                    .show();
         } else {
             mArtistFilterFragment.restartLoader();
         }

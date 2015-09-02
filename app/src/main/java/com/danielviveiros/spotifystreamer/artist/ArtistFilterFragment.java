@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -26,9 +27,15 @@ import android.widget.TextView;
 import com.danielviveiros.spotifystreamer.R;
 import com.danielviveiros.spotifystreamer.data.SpotifyStreamerContract;
 import com.danielviveiros.spotifystreamer.media.MediaManager;
+import com.danielviveiros.spotifystreamer.util.Utilities;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnEditorAction;
+import butterknife.OnItemClick;
 
 
 /**
@@ -53,9 +60,10 @@ public class ArtistFilterFragment extends Fragment
     private ArtistAdapter mArtistAdapter;
 
     /**
-     * List view
+     * UI Components
      */
-    private ListView mArtistsListView;
+    @Bind(R.id.listview_artist) ListView mArtistsListView;
+    @Bind(R.id.artist_filter) EditText mArtistEditText;
 
     /**
      * Filter
@@ -101,86 +109,92 @@ public class ArtistFilterFragment extends Fragment
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.artistfilter_fragment, container, false);
+        ButterKnife.bind(this, rootView);
 
         //creates the adapter and sets into the list view
         mArtistAdapter = new ArtistAdapter(getActivity(), null, 0);
-        mArtistsListView = (ListView) rootView.findViewById(R.id.listview_artist);
         mArtistsListView.setAdapter(mArtistAdapter);
 
-        //set the click listener to the list view
-        mArtistsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
-                if (cursor != null) {
-                    String artistKey = cursor.getString(ArtistRepository.COL_INDEX_KEY);
-                    String artistName = cursor.getString(ArtistRepository.COL_INDEX_NAME);
-                    mMediaManager.setArtistId( artistKey );
-                    mMediaManager.setArtistName( artistName );
-                    for ( Callback callback: mListCallbacks ) {
-                        callback.onItemSelected( artistKey, artistName );
-                    }
-                }
-            }
-        });
-
-        //set the listener for the edit text
-        EditText artistEditText = (EditText) rootView.findViewById(R.id.artist_filter);
+        //if there is a previously selected artist, define it and triggers the update
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
                 getActivity().getBaseContext());
-        artistEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-
-                    String text = v.getText().toString();
-                    if (TextUtils.isEmpty(text)) {
-                        return false;
-                    }
-
-                    //check if the filter has changed
-                    if ( (getArtistFilter() != null) && (text.equals(getArtistFilter())) ) {
-                        return false;
-                    }
-
-                    //shows a "loading" dialog
-                    mProgressDialog = ProgressDialog.show(getActivity(), "Please wait ...", "Fetching artists ...", true);
-                    getActivity().getCurrentFocus();
-
-
-                    //saves the value in case the user hits the back button
-                    mArtistFilter = text;
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
-                            getActivity().getBaseContext());
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putString("mArtistFilter", mArtistFilter);
-                    editor.commit();
-
-                    //updates the list
-                    updateArtistList();
-
-                    //hide the keyboard
-                    InputMethodManager imm = (InputMethodManager) getActivity().
-                            getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        //if there is a previously selected artist, define it and triggers the update
         mArtistFilter = prefs.getString("mArtistFilter", null);
         if (!TextUtils.isEmpty(mArtistFilter)) {
-            artistEditText.setText(mArtistFilter);
+            mArtistEditText.setText(mArtistFilter);
             updateArtistList();
         }
 
         return rootView;
     }
+
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
+
+    /**
+     * Handler for clicks in the artist list
+     */
+    @OnItemClick(R.id.listview_artist)
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
+        if (cursor != null) {
+            String artistKey = cursor.getString(ArtistRepository.COL_INDEX_KEY);
+            String artistName = cursor.getString(ArtistRepository.COL_INDEX_NAME);
+            mMediaManager.setArtistId( artistKey );
+            mMediaManager.setArtistName( artistName );
+            for ( Callback callback: mListCallbacks ) {
+                callback.onItemSelected( artistKey, artistName );
+            }
+        }
+    }
+
+
+    /**
+     * Handler for the artist filter text field. This method is triggered whenever the
+     * action has changed and submitted
+     */
+    @OnEditorAction(R.id.artist_filter)
+    public boolean filterArtist(TextView v, int actionId, KeyEvent event) {
+
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+
+            String text = v.getText().toString();
+            if (TextUtils.isEmpty(text)) {
+                return false;
+            }
+
+            //check if the filter has changed
+            if ((getArtistFilter() != null) && (text.equals(getArtistFilter()))) {
+                return false;
+            }
+
+            //shows a "loading" dialog
+            mProgressDialog = ProgressDialog.show(getActivity(), "Please wait ...", "Fetching artists ...", true);
+            getActivity().getCurrentFocus();
+
+
+            //saves the value in case the user hits the back button
+            mArtistFilter = text;
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
+                    getActivity().getBaseContext());
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("mArtistFilter", mArtistFilter);
+            editor.commit();
+
+            //updates the list
+            updateArtistList();
+
+            //hide the keyboard
+            InputMethodManager imm = (InputMethodManager) getActivity().
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+
+            return true;
+        }
+        return false;
+    }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -213,7 +227,7 @@ public class ArtistFilterFragment extends Fragment
      * Hide progress dialog
      */
     void hideProgressDialog() {
-        if (mProgressDialog != null) {
+        if ((mProgressDialog != null) && (mProgressDialog.isShowing())){
             mProgressDialog.dismiss();
         }
     }
@@ -222,9 +236,17 @@ public class ArtistFilterFragment extends Fragment
      * Updates the list of artists shown
      */
     private void updateArtistList() {
-        //trigger the artist fetching
-        FetchArtistsTask artistsTask = new FetchArtistsTask(this);
-        artistsTask.execute(getArtistFilter());
+        if (Utilities.isOnline(getActivity())) {
+            //trigger the artist fetching
+            FetchArtistsTask artistsTask = new FetchArtistsTask(this);
+            artistsTask.execute(getArtistFilter());
+        } else {
+            this.hideProgressDialog();
+            if (getView() != null) {
+                Snackbar.make(getView(), R.string.artist_filter_error, Snackbar.LENGTH_LONG)
+                        .show(); // Don’t forget to show!
+            }
+        }
     }
 
     String getArtistFilter() {

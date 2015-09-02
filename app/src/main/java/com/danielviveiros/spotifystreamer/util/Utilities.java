@@ -1,5 +1,9 @@
 package com.danielviveiros.spotifystreamer.util;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Image;
@@ -54,5 +58,15 @@ public class Utilities {
         } else {
             return Constants.DEFAULT_IMAGE;
         }
+    }
+
+    /**
+     * Check if there is internet connection
+     */
+    public static boolean isOnline( Context context ) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }

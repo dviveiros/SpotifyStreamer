@@ -12,6 +12,9 @@ import android.widget.TextView;
 import com.danielviveiros.spotifystreamer.R;
 import com.squareup.picasso.Picasso;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * Custom adapter to handle artist list (search) information
  * Created by dviveiros on 24/06/15.
@@ -29,15 +32,14 @@ public class ArtistAdapter extends CursorAdapter {
      * View holder pattern
      */
     public class ViewHolder {
-        ImageView artistIconView;
-        TextView artistNameView;
+        @Bind(R.id.artist_icon) ImageView artistIconView;
+        @Bind(R.id.artist_name) TextView artistNameView;
 
         /**
          * Constructor
          */
         public ViewHolder( View view ) {
-            this.artistNameView = (TextView) view.findViewById(R.id.artist_name);
-            this.artistIconView = (ImageView) view.findViewById(R.id.artist_icon);
+            ButterKnife.bind(this, view);
         }
 
     }
