@@ -14,6 +14,7 @@ public class PlayerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setContentView(R.layout.activity_player);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         PlayerActivityFragment newFragment = new PlayerActivityFragment();
@@ -21,6 +22,15 @@ public class PlayerActivity extends AppCompatActivity {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(android.R.id.content, newFragment)
                 .addToBackStack(null).commit();
+
+        /*
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //Toolbar will now take on default actionbar characteristics
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(R.string.title_activity_player);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        */
     }
 
 

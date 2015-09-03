@@ -3,6 +3,7 @@ package com.danielviveiros.spotifystreamer.main;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -26,6 +27,11 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //Toolbar will now take on default actionbar characteristics
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(R.string.app_name);
 
         if (findViewById(R.id.top_tracks_container) != null) {
             //two pane mode

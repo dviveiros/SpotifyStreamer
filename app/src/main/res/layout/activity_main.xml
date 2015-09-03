@@ -1,10 +1,27 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fragment_artist_filter"
-    android:name="com.danielviveiros.spotifystreamer.artist.ArtistFilterFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    tools:context="com.danielviveiros.spotifystreamer.artist.ArtistFilterFragment"
-    tools:layout="@layout/artistfilter_fragment"/>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/toolbar">
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/fragment_artist_filter"
+            android:name="com.danielviveiros.spotifystreamer.artist.ArtistFilterFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            tools:context="com.danielviveiros.spotifystreamer.artist.ArtistFilterFragment"
+            tools:layout="@layout/artistfilter_fragment"/>
+
+    </LinearLayout>
+</RelativeLayout>
